@@ -1,0 +1,13 @@
+**/a.out
+out/
+build
+build/**
+.vscode
+.vs
+**/.env
+**/.obj
+*.spv
+*.a
+textures_
+imgui.ini
+*.env.cmake
