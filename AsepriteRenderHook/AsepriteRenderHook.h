@@ -22,6 +22,6 @@ private:
 	const uint32_t WIDTH = 800;
 	const uint32_t HEIGHT = 600;
 
-	ArhWindow m_window;
+	wrengine::Window m_window;
 	wrengine::Renderer renderer;
 };

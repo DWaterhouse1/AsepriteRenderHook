@@ -17,24 +17,47 @@ else()
 	message(STATUS "Using vulkan lib at ${Vulkan_LIBRARIES}")
 endif()
 
+# glfw
+if (DEFINED GLFW_PATH)
+	message(STATUS "using GLFW path specified in .env")
+	set(GLFW_INCLUDE_DIRS "${GLFW_PATH}/include")
+	if(MSVC)
+		set(GLFW_LIB "${GLFW_PATH}/lib-vc2022") # check that this is the correct version of visual studio
+	elseif(CMAKE_GENERATOR STREQUAL "MinGW Makefiles")
+		message(STATUS "USING MINGW")
+    set(GLFW_LIB "${GLFW_PATH}/lib-mingw-w64")
+	endif()
+else()
+	find_package(glfw3 3.3 REQUIRED)
+  set(GLFW_LIB glfw)
+  message(STATUS "Found GLFW")
+endif()
+if (NOT GLFW_LIB)
+	message(FATAL_ERROR "Could not find glfw library!")
+else()
+	message(STATUS "Using glfw lib at: ${GLFW_LIB}")
+endif()
+
 # imgui
 #file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp)
 #add_library("ImGui" STATIC ${IMGUI_SOURCES})
 
-add_library(${PROJECT_NAME} Renderer.cpp "Pipeline.h" "Pipeline.cpp" "Device.h" "Device.cpp"  )
+add_library(${PROJECT_NAME} Renderer.cpp "Pipeline.h" "Pipeline.cpp" "Device.h" "Device.cpp"   "Window.h" "Window.cpp")
 
 target_include_directories( ${PROJECT_NAME}
 	PUBLIC
 		${PROJECT_SOURCE_DIR}
 		${Vulkan_INCLUDE_DIRS}
+   	${GLFW_INCLUDE_DIRS}
 )
 
 target_link_directories(${PROJECT_NAME}
 	PUBLIC
 		${Vulkan_LIBRARIES}
+    ${GLFW_LIB}
 )
 
-target_link_libraries(${PROJECT_NAME} vulkan-1)
+target_link_libraries(${PROJECT_NAME} vulkan-1 glfw3)
 
 ## build shader files to spir-v
 find_program(GLSL_VALIDATOR glslangValidator HINTS 

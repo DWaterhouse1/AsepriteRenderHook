@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Window.h"
+
 namespace wrengine
 {
 	class Device
@@ -11,6 +13,15 @@ namespace wrengine
 #else
 		static constexpr bool enableValidationLayers = true;
 #endif
+
+		Device();
+
 	private:
+		void createInstance();
+		void setupDebugMessenger();
+		void createSurface();
+		void pickPhysicalDevice();
+		void createLogicalDevice();
+		void createCommandPool();
 	};
 }
