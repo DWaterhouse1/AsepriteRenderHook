@@ -1,12 +1,18 @@
 #include "Window.h"
+
+#include <iostream>
+
 namespace wrengine
 {
 	Window::Window(
 		const uint32_t width = 800,
-		const uint32_t height = 600
+		const uint32_t height = 600,
+		const std::string& name = "GLFW window"
 	) :
 		m_width{ width },
-		m_height{ height }
+		m_height{ height },
+		m_windowName{ name }
+
 	{
 		if (!glfwInit())
 		{
@@ -15,7 +21,8 @@ namespace wrengine
 
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-		m_window = glfwCreateWindow(800, 600, "please save me from this hell", nullptr, nullptr);
+
+		m_window = glfwCreateWindow(m_width, m_height, m_windowName.c_str(), nullptr, nullptr);
 		if (!m_window)
 		{
 			throw std::runtime_error("Failed to create GLFW window!");
