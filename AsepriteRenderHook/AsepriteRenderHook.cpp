@@ -3,7 +3,7 @@
 
 #include "AsepriteRenderHook.h"
 
-AsepriteRenderHook::AsepriteRenderHook() : m_window(WIDTH, HEIGHT, "Aseprite Render Hook") {}
+AsepriteRenderHook::AsepriteRenderHook() {}
 
 void AsepriteRenderHook::run()
 {
@@ -12,7 +12,7 @@ void AsepriteRenderHook::run()
 
 void AsepriteRenderHook::mainLoop()
 {
-	while (!m_window.shouldClose())
+	while (!m_renderer.windowShouldClose())
 	{
 		glfwPollEvents();
 	}

@@ -14,8 +14,8 @@ namespace wrengine
 	public:
 		Window(
 			const uint32_t width,
-			const uint32_t height,
-			std::string name
+			const uint32_t height
+			//std::string name
 		);
 		~Window();
 
@@ -29,7 +29,7 @@ namespace wrengine
 	private:
 		const uint32_t m_width;
 		const uint32_t m_height;
-		std::string m_windowName;
-		GLFWwindow* m_window;
+		//std::string m_windowName;
+		GLFWwindow* m_window = nullptr;
 	};
 } // namespace wrengine

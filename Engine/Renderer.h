@@ -4,14 +4,29 @@
 
 #include "Pipeline.h"
 
+//std
+#include <string>
+
 namespace wrengine
 {
 	class Renderer
 	{
 	public:
-		Renderer();
+		Renderer() {}
+
+		bool windowShouldClose();
 
 	private:
-		Pipeline pipeline{ "shaders/simple_shader.vert.spv", "shaders/simple_shader.frag.spv" };
+		Window m_window{ m_width, m_height };
+		Device m_device{ m_window };
+		Pipeline m_pipeline{
+			m_device,
+			"shaders/simple_shader.vert.spv",
+			"shaders/simple_shader.frag.spv",
+			Pipeline::defaultPipelineConfigInfo(m_width, m_height)};
+
+		uint32_t m_width = 800;
+		uint32_t m_height = 600;
+		std::string m_windowName = "hello";
 	};
 } // namespace wrengine

@@ -2,9 +2,8 @@
 
 namespace wrengine
 {
-	Renderer::Renderer()
+	bool Renderer::windowShouldClose()
 	{
-
+		return m_window.shouldClose();
 	}
-
 } // namespace wrengine
