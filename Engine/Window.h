@@ -24,6 +24,7 @@ namespace wrengine
 		Window& operator=(const Window&) = delete;
 
 		bool shouldClose() { return glfwWindowShouldClose(m_window); }
+		VkExtent2D getExtent() { return { m_width, m_height }; }
 		void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 
 	private:

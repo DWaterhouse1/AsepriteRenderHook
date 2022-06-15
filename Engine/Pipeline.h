@@ -8,7 +8,21 @@
 
 namespace wrengine
 {
-	struct PipelineConfigInfo {};
+	struct PipelineConfigInfo
+	{
+		VkViewport viewport;
+		VkRect2D scissor;
+		VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
+		VkPipelineRasterizationStateCreateInfo rasterizationInfo;
+		VkPipelineMultisampleStateCreateInfo multisampleInfo;
+		VkPipelineColorBlendAttachmentState colorBlendAttachment;
+		VkPipelineColorBlendStateCreateInfo colorBlendInfo;
+		VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
+		VkPipelineLayout pipelineLayout = nullptr;
+		VkRenderPass renderPass = nullptr;
+		uint32_t subpass = 0;
+	};
+
 	class Pipeline
 	{
 	public:
@@ -18,7 +32,7 @@ namespace wrengine
 			const std::string& fragFilepath,
 			const PipelineConfigInfo& pipelineInfo
 		);
-		~Pipeline() {}
+		~Pipeline();
 
 		// should not be copied
 		Pipeline(const Pipeline&) = delete;

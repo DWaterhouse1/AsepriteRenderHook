@@ -23,10 +23,10 @@ namespace wrengine
 
 		Window m_window{ m_width, m_height, m_windowName };
 		Device m_device{ m_window };
-		Pipeline m_pipeline{
+		/*Pipeline m_pipeline{
 			m_device,
 			"shaders/simple_shader.vert.spv",
 			"shaders/simple_shader.frag.spv",
-			Pipeline::defaultPipelineConfigInfo(m_width, m_height)};
+			Pipeline::defaultPipelineConfigInfo(m_width, m_height)};*/
 	};
 } // namespace wrengine

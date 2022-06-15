@@ -26,7 +26,7 @@ namespace wrengine
 	public:
 		// enables validation layers only in debug configurations
 #ifdef NDEBUG
-		constexpr bool enableValidationLayers = false;
+		static constexpr bool enableValidationLayers = false;
 #else
 		static constexpr bool enableValidationLayers = true;
 #endif
