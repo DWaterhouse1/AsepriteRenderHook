@@ -93,4 +93,9 @@ add_custom_target(
     DEPENDS ${SPIRV_BINARY_FILES}
 )
 
-add_dependencies(Engine Shaders)
+add_custom_target(copyShaders ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/shaders ${PROJECT_BINARY_DIR}/shaders
+    DEPENDS ${SPIRV_BINARY_FILES}
+)
+
+add_dependencies(Engine Shaders copyShaders)
