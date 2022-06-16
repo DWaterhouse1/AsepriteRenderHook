@@ -15,5 +15,7 @@ void AsepriteRenderHook::mainLoop()
 	while (!m_renderer.windowShouldClose())
 	{
 		glfwPollEvents();
+		m_renderer.drawFrame();
 	}
+	m_renderer.waitIdle();
 }

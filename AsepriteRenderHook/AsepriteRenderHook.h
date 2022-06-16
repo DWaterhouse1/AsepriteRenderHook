@@ -22,5 +22,5 @@ private:
 	const uint32_t WIDTH = 800;
 	const uint32_t HEIGHT = 600;
 	
-	wrengine::Renderer m_renderer;
+	wrengine::Renderer m_renderer{WIDTH, HEIGHT, "Aseprite Render Hook"};
 };

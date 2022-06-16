@@ -26,20 +26,32 @@ namespace wrengine
 			vkDestroySwapchainKHR(m_device.device(), m_swapchain, nullptr);
 			m_swapchain = nullptr;
 		}
+
 		for (auto imageView : m_imageViews)
 		{
 			vkDestroyImageView(m_device.device(), imageView, nullptr);
 		}
 		m_imageViews.clear();
+
 		for (int i = 0; i < m_depthImages.size(); ++i)
 		{
 			vkDestroyImageView(m_device.device(), m_depthImageViews[i], nullptr);
 			vkDestroyImage(m_device.device(), m_depthImages[i], nullptr);
 			vkFreeMemory(m_device.device(), m_depthImageMemorys[i], nullptr);
 		}
+
 		for (auto framebuffer : m_swapchainFramebuffers)
 		{
 			vkDestroyFramebuffer(m_device.device(), framebuffer, nullptr);
+		}
+
+		vkDestroyRenderPass(m_device.device(), m_renderPass, nullptr);
+
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i)
+		{
+			vkDestroySemaphore(m_device.device(), m_renderFinishedSemaphores[i], nullptr);
+			vkDestroySemaphore(m_device.device(), m_imageAvailableSemaphores[i], nullptr);
+			vkDestroyFence(m_device.device(), m_inFlightFences[i], nullptr);
 		}
 	}
 
@@ -257,8 +269,6 @@ namespace wrengine
 				throw std::runtime_error("unable to create image views!");
 			}
 		}
-
-
 	}
 
 	void Swapchain::createDepthResources()
@@ -375,19 +385,17 @@ namespace wrengine
 
 	void Swapchain::createFramebuffers()
 	{
-		m_swapchainFramebuffers.resize(m_imageViews.size());
+		m_swapchainFramebuffers.resize(imageCount());
 
-		for (size_t i = 0; i < m_imageViews.size(); ++i)
+		for (size_t i = 0; i < imageCount(); ++i)
 		{
-			VkImageView attachments[] = {
-					m_imageViews[i]
-			};
+			std::array<VkImageView, 2> attachments = { m_imageViews[i], m_depthImageViews[i] };
 
 			VkFramebufferCreateInfo framebufferInfo{};
 			framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 			framebufferInfo.renderPass = m_renderPass;
-			framebufferInfo.attachmentCount = 1;
-			framebufferInfo.pAttachments = attachments;
+			framebufferInfo.attachmentCount = attachments.size();
+			framebufferInfo.pAttachments = attachments.data();
 			framebufferInfo.width = m_swapchainExtent.width;
 			framebufferInfo.height = m_swapchainExtent.height;
 			framebufferInfo.layers = 1;

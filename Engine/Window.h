@@ -13,9 +13,9 @@ namespace wrengine
 	{
 	public:
 		Window(
-			const uint32_t width,
-			const uint32_t height,
-			const std::string& name
+			const uint32_t width = 800,
+			const uint32_t height = 600,
+			const std::string& name = "GLFW window"
 		);
 		~Window();
 
