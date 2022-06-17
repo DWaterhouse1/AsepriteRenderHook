@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vulkan/vulkan.hpp>
+#include <imgui.h>
 
 #include "Pipeline.h"
 #include "Swapchain.h"
@@ -32,6 +33,7 @@ namespace wrengine
 		bool windowShouldClose();
 		void drawFrame();
 		void waitIdle();
+		void initImGui();
 
 	private:
 		// helper functions

@@ -40,7 +40,16 @@ endif()
 
 # imgui
 #file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp)
-#add_library("ImGui" STATIC ${IMGUI_SOURCES})
+add_library(imgui STATIC 
+  "${IMGUI_PATH}/imgui.cpp"
+  "${IMGUI_PATH}/imgui_demo.cpp"
+  "${IMGUI_PATH}/imgui_draw.cpp"
+  "${IMGUI_PATH}/imgui_tables.cpp"
+  "${IMGUI_PATH}/imgui_widgets.cpp"
+
+  "${IMGUI_PATH}/backends/imgui_impl_glfw.cpp"
+  "${IMGUI_PATH}/backends/imgui_impl_vulkan.cpp")
+
 
 add_library(${PROJECT_NAME}
   Renderer.cpp
@@ -71,7 +80,7 @@ target_link_directories(${PROJECT_NAME}
     ${GLFW_LIB}
 )
 
-target_link_libraries(${PROJECT_NAME} vulkan-1 glfw3)
+target_link_libraries(${PROJECT_NAME} vulkan-1 glfw3 imgui)
 
 ## build shader files to spir-v
 find_program(GLSL_VALIDATOR glslangValidator HINTS 
