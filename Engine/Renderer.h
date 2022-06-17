@@ -38,6 +38,9 @@ namespace wrengine
 		void createPipelineLayout();
 		void createPipeline();
 		void createCommandBuffers();
+		void freeCommandBuffers();
+		void recreateSwapchain();
+		void recordCommandBuffer(uint32_t imageIndex);
 
 		// window params
 		uint32_t m_width = 800;
@@ -47,7 +50,7 @@ namespace wrengine
 		// vulkan/glfw structures
 		Window m_window{ m_width, m_height, m_windowName };
 		Device m_device{ m_window };
-		Swapchain m_swapchain{ m_device, m_window.getExtent()};
+		std::unique_ptr<Swapchain> m_swapchain;
 		std::unique_ptr<Pipeline> m_pipeline;
 		VkPipelineLayout m_pipelineLayout;
 		std::unique_ptr<Model> m_model;

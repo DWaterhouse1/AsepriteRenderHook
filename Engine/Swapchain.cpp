@@ -11,6 +11,24 @@ namespace wrengine
 		m_device{ deviceRef },
 		m_extent{ extent }
 	{
+		init();
+	}
+
+	Swapchain::Swapchain(
+		Device& deviceRef,
+		VkExtent2D extent,
+		std::shared_ptr<Swapchain> previous
+	) :
+		m_device{ deviceRef },
+		m_extent{ extent },
+		m_oldSwapchain{ previous }
+	{
+		init();
+		m_oldSwapchain = nullptr;
+	}
+
+	void Swapchain::init()
+	{
 		createSwapChain();
 		createImageViews();
 		createDepthResources();
@@ -24,7 +42,7 @@ namespace wrengine
 		if (m_swapchain != nullptr)
 		{
 			vkDestroySwapchainKHR(m_device.device(), m_swapchain, nullptr);
-			m_swapchain = nullptr;
+			//m_swapchain = nullptr;
 		}
 
 		for (auto imageView : m_imageViews)
@@ -228,7 +246,7 @@ namespace wrengine
 		createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 		createInfo.presentMode = presentMode;
 		createInfo.clipped = VK_TRUE;
-		createInfo.oldSwapchain = VK_NULL_HANDLE;
+		createInfo.oldSwapchain = m_oldSwapchain == nullptr ? VK_NULL_HANDLE : m_oldSwapchain->m_swapchain;
 
 		if (vkCreateSwapchainKHR(m_device.device(), &createInfo, nullptr, &m_swapchain) != VK_SUCCESS)
 		{
@@ -394,7 +412,7 @@ namespace wrengine
 			VkFramebufferCreateInfo framebufferInfo{};
 			framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 			framebufferInfo.renderPass = m_renderPass;
-			framebufferInfo.attachmentCount = attachments.size();
+			framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
 			framebufferInfo.pAttachments = attachments.data();
 			framebufferInfo.width = m_swapchainExtent.width;
 			framebufferInfo.height = m_swapchainExtent.height;

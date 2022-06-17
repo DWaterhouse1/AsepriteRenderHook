@@ -6,6 +6,7 @@
 #include <vulkan/vulkan.hpp>
 
 // std
+#include <memory>
 
 namespace wrengine
 {
@@ -15,6 +16,7 @@ namespace wrengine
 		static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 		Swapchain(Device &deviceRef, VkExtent2D extent);
+		Swapchain(Device &deviceRef, VkExtent2D extent, std::shared_ptr<Swapchain> previous);
 		~Swapchain();
 
 		// should not be copied
@@ -38,6 +40,7 @@ namespace wrengine
 		VkResult submitCommandBuffers(const VkCommandBuffer* buffers, uint32_t* imageIndex);
 		
 	private:
+		void init();
 		void createSwapChain();
 		void createImageViews();
 		void createDepthResources();
@@ -57,6 +60,7 @@ namespace wrengine
 		VkFormat m_swapchainImageFormat;
 		VkExtent2D m_swapchainExtent;
 		VkRenderPass m_renderPass;
+		std::shared_ptr<Swapchain> m_oldSwapchain;
 
 		std::vector<VkImage> m_swapchainImages;
 		std::vector<VkImageView> m_imageViews;

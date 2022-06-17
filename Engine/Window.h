@@ -6,6 +6,7 @@
 // std
 #include <stdexcept>
 #include <string>
+#include <iostream>
 
 namespace wrengine
 {
@@ -24,13 +25,17 @@ namespace wrengine
 		Window& operator=(const Window&) = delete;
 
 		bool shouldClose() { return glfwWindowShouldClose(m_window); }
+		bool wasResized() { return bFramebufferResized; }
+		void resetWindowResizeFlag() { bFramebufferResized = false; }
 		VkExtent2D getExtent() { return { m_width, m_height }; }
 		void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 
 	private:
-		const uint32_t m_width;
-		const uint32_t m_height;
+		static void framebufferResizedCallback(GLFWwindow* window, int width, int height);
+		uint32_t m_width;
+		uint32_t m_height;
 		std::string m_windowName;
 		GLFWwindow* m_window = nullptr;
+		bool bFramebufferResized = false;
 	};
 } // namespace wrengine
