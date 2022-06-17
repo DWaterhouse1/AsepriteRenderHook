@@ -42,7 +42,20 @@ endif()
 #file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp)
 #add_library("ImGui" STATIC ${IMGUI_SOURCES})
 
-add_library(${PROJECT_NAME} Renderer.cpp Pipeline.h Pipeline.cpp Device.h Device.cpp Window.h Window.cpp Swapchain.h Swapchain.cpp "Model.h" "Model.cpp")
+add_library(${PROJECT_NAME}
+  Renderer.cpp
+  Pipeline.h
+  Pipeline.cpp
+  Device.h
+  Device.cpp
+  Window.h
+  Window.cpp
+  Swapchain.h
+  Swapchain.cpp
+  Model.h
+  Model.cpp
+  Entity.h
+  Entity.cpp)
 
 target_include_directories( ${PROJECT_NAME}
 	PUBLIC

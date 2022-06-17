@@ -1,9 +1,21 @@
 #include "Renderer.h"
 
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
+
 // std
 #include <stdexcept>
 #include <array>
 #include <iostream>
+
+struct SimplePushConstantData
+{
+	glm::mat2 transform{1.0f};
+	glm::vec2 offset;
+	alignas(16) glm::vec3 color;
+};
 
 namespace wrengine
 {
@@ -15,7 +27,7 @@ namespace wrengine
 		m_height{ height },
 		m_windowName{ windowName }
 	{
-		loadModels();
+		loadEntities();
 		createPipelineLayout();
 		recreateSwapchain();
 		createCommandBuffers();
@@ -26,8 +38,7 @@ namespace wrengine
 		vkDestroyPipelineLayout(m_device.device(), m_pipelineLayout, nullptr);
 	}
 
-	// Interface start -----------------
-
+	// Interface start ----------------------------------
 	bool Renderer::windowShouldClose()
 	{
 		return m_window.shouldClose();
@@ -51,8 +62,8 @@ namespace wrengine
 
 		recordCommandBuffer(imageIndex);
 		result = m_swapchain->submitCommandBuffers(&m_commandBuffers[imageIndex], &imageIndex);
-		if (result ==
-			VK_ERROR_OUT_OF_DATE_KHR ||
+		if (
+			result == VK_ERROR_OUT_OF_DATE_KHR ||
 			result == VK_SUBOPTIMAL_KHR ||
 			m_window.wasResized())
 		{
@@ -70,9 +81,9 @@ namespace wrengine
 	{
 		vkDeviceWaitIdle(m_device.device());
 	}
-	//  Interface end  -----------------
+	//  Interface end  ----------------------------------
 
-	void Renderer::loadModels()
+	void Renderer::loadEntities()
 	{
 		std::vector<Model::Vertex> vertices
 		{
@@ -81,17 +92,31 @@ namespace wrengine
 			{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
 		};
 
-		m_model = std::make_unique<Model>(m_device, vertices);
+		auto model = std::make_shared<Model>(m_device, vertices);
+		
+		auto triangle = Entity::createEntity();
+		triangle.model = model;
+		triangle.color = { 0.1f, 0.8f, 0.1f };
+		triangle.transform2D.translation.x = 0.2f;
+		triangle.transform2D.scale = { 2.0f, 0.5f };
+		triangle.transform2D.rotation = 0.25f * glm::two_pi<float>();
+		m_entities.push_back(std::move(triangle));
 	}
 
 	void Renderer::createPipelineLayout()
 	{
+		VkPushConstantRange pushConstantRange{};
+		pushConstantRange.stageFlags =
+			VK_SHADER_STAGE_VERTEX_BIT |
+			VK_SHADER_STAGE_FRAGMENT_BIT;
+		pushConstantRange.size = sizeof(SimplePushConstantData);
+
 		VkPipelineLayoutCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 		createInfo.setLayoutCount = 0;
 		createInfo.pSetLayouts = nullptr;
-		createInfo.pushConstantRangeCount = 0;
-		createInfo.pPushConstantRanges = nullptr;
+		createInfo.pushConstantRangeCount = 1;
+		createInfo.pPushConstantRanges = &pushConstantRange;
 		
 		if (vkCreatePipelineLayout(m_device.device(), &createInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS)
 		{
@@ -153,7 +178,7 @@ namespace wrengine
 		}
 
 		std::array<VkClearValue, 2> clearValues{};
-		clearValues[0].color = { 0.1f, 0.1f, 0.1f, 1.0f };
+		clearValues[0].color = { 0.01f, 0.01f, 0.01f, 1.0f };
 		clearValues[1].depthStencil = { 1.0f, 0 };
 
 		VkRenderPassBeginInfo renderPassInfo{};
@@ -178,15 +203,37 @@ namespace wrengine
 		vkCmdSetViewport(m_commandBuffers[imageIndex], 0, 1, &viewport);
 		vkCmdSetScissor(m_commandBuffers[imageIndex], 0, 1, &scissor);
 
-		m_pipeline->bind(m_commandBuffers[imageIndex]);
-
-		m_model->bind(m_commandBuffers[imageIndex]);
-		m_model->draw(m_commandBuffers[imageIndex]);
+		renderEntities(m_commandBuffers[imageIndex]);
 
 		vkCmdEndRenderPass(m_commandBuffers[imageIndex]);
 		if (vkEndCommandBuffer(m_commandBuffers[imageIndex]) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to record command bufffer!");
+		}
+	}
+
+	void Renderer::renderEntities(VkCommandBuffer commandBuffer)
+	{
+		m_pipeline->bind(commandBuffer);
+		for (auto& entity : m_entities)
+		{
+			entity.transform2D.rotation = glm::mod(entity.transform2D.rotation + 0.001f, glm::two_pi<float>());
+
+			SimplePushConstantData push{};
+			push.offset = entity.transform2D.translation;
+			push.color = entity.color;
+			push.transform = entity.transform2D.mat2();//entity.transform2D.mat2();
+
+			vkCmdPushConstants(
+				commandBuffer,
+				m_pipelineLayout,
+				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+				0,
+				sizeof(SimplePushConstantData),
+				&push);
+
+			entity.model->bind(commandBuffer);
+			entity.model->draw(commandBuffer);
 		}
 	}
 

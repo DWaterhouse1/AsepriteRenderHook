@@ -5,6 +5,7 @@
 #include "Pipeline.h"
 #include "Swapchain.h"
 #include "Model.h"
+#include "Entity.h"
 
 //std
 #include <string>
@@ -34,13 +35,14 @@ namespace wrengine
 
 	private:
 		// helper functions
-		void loadModels();
+		void loadEntities();
 		void createPipelineLayout();
 		void createPipeline();
 		void createCommandBuffers();
 		void freeCommandBuffers();
 		void recreateSwapchain();
 		void recordCommandBuffer(uint32_t imageIndex);
+		void renderEntities(VkCommandBuffer commandBuffer);
 
 		// window params
 		uint32_t m_width = 800;
@@ -53,7 +55,7 @@ namespace wrengine
 		std::unique_ptr<Swapchain> m_swapchain;
 		std::unique_ptr<Pipeline> m_pipeline;
 		VkPipelineLayout m_pipelineLayout;
-		std::unique_ptr<Model> m_model;
+		std::vector<Entity> m_entities;
 		std::vector<VkCommandBuffer> m_commandBuffers;
 	};
 } // namespace wrengine
