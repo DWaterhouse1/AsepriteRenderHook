@@ -35,6 +35,8 @@ namespace wrengine
 
 	Renderer::~Renderer()
 	{
+		vkDestroyDescriptorPool(m_device.device(), m_imguiPool, nullptr);
+		ImGui_ImplVulkan_Shutdown();
 		vkDestroyPipelineLayout(m_device.device(), m_pipelineLayout, nullptr);
 	}
 
@@ -131,7 +133,27 @@ namespace wrengine
 
 		ImGui_ImplVulkan_CreateFontsTexture(fontCommandBuffer);
 
+		vkEndCommandBuffer(fontCommandBuffer);
 		m_device.endSingleTimeCommands(fontCommandBuffer);
+
+		ImGui_ImplVulkan_DestroyFontUploadObjects();
+	}
+
+	void Renderer::mainLoop()
+	{
+		while (!windowShouldClose())
+		{
+			glfwPollEvents();
+
+			ImGui_ImplVulkan_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();
+
+			ImGui::ShowDemoWindow();
+			ImGui::Render();
+			drawFrame();
+		}
+		waitIdle();
 	}
 	//  Interface end  ----------------------------------
 
@@ -256,6 +278,8 @@ namespace wrengine
 		vkCmdSetScissor(m_commandBuffers[imageIndex], 0, 1, &scissor);
 
 		renderEntities(m_commandBuffers[imageIndex]);
+
+		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), m_commandBuffers[imageIndex]);
 
 		vkCmdEndRenderPass(m_commandBuffers[imageIndex]);
 		if (vkEndCommandBuffer(m_commandBuffers[imageIndex]) != VK_SUCCESS)

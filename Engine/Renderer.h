@@ -2,6 +2,10 @@
 
 #include <vulkan/vulkan.hpp>
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_vulkan.h>
+
 #include "Pipeline.h"
 #include "Swapchain.h"
 #include "Model.h"
@@ -33,6 +37,7 @@ namespace wrengine
 		void drawFrame();
 		void waitIdle();
 		void initImGui();
+		void mainLoop();
 
 	private:
 		// helper functions
@@ -57,7 +62,7 @@ namespace wrengine
 		std::unique_ptr<Pipeline> m_pipeline;
 		VkPipelineLayout m_pipelineLayout;
 		std::vector<Entity> m_entities;
-		std::vector<VkCommandBuffer> m_commandBuffers;
+		std::vector<VkCommandBuffer> m_commandBuffers;;
 		VkDescriptorPool m_imguiPool;
 	};
 } // namespace wrengine

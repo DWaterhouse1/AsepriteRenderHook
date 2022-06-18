@@ -39,8 +39,10 @@ else()
 endif()
 
 # imgui
-
-
+find_package(imgui CONFIG REQUIRED) 
+if(NOT imgui_FOUND)
+  message(STATUS "could not find imgui using vcpkg")
+endif()
 
 add_library(${PROJECT_NAME}
   Renderer.cpp
@@ -62,6 +64,7 @@ target_include_directories( ${PROJECT_NAME}
 		${PROJECT_SOURCE_DIR}
 		${Vulkan_INCLUDE_DIRS}
    	${GLFW_INCLUDE_DIRS}
+    ${GLM_PATH}
 )
 
 target_link_directories(${PROJECT_NAME}
@@ -70,7 +73,7 @@ target_link_directories(${PROJECT_NAME}
     ${GLFW_LIB}
 )
 
-target_link_libraries(${PROJECT_NAME} vulkan-1 glfw3)
+target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan glfw3 imgui::imgui)
 
 ## build shader files to spir-v
 find_program(GLSL_VALIDATOR glslangValidator HINTS 
