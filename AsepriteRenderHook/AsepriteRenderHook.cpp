@@ -7,6 +7,7 @@ AsepriteRenderHook::AsepriteRenderHook() {}
 
 void AsepriteRenderHook::run()
 {
+	m_renderer.initImGui();
 	mainLoop();
 }
 

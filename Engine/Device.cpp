@@ -248,6 +248,14 @@ namespace wrengine
 		}
 	}
 
+	void Device::setImguiInfo(ImGui_ImplVulkan_InitInfo& initInfo)
+	{
+		initInfo.Instance = m_instance;
+		initInfo.PhysicalDevice = m_physicalDevice;
+		initInfo.Device = m_device;
+		initInfo.Queue = m_graphicsQueue;
+	}
+
 	void Device::createInstance()
 	{
 		if (enableValidationLayers && !checkValidationLayerSupport())

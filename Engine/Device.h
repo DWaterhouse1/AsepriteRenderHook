@@ -72,6 +72,8 @@ namespace wrengine
 			VkImage& image,
 			VkDeviceMemory& imageMemory);
 
+		void setImguiInfo(ImGui_ImplVulkan_InitInfo& initInfo);
+
 		VkPhysicalDeviceProperties m_properties;
 
 	private:

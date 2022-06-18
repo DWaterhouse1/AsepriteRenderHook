@@ -107,14 +107,31 @@ namespace wrengine
 		poolInfo.poolSizeCount = static_cast<uint32_t>(std::size(poolSizes));
 		poolInfo.pPoolSizes = poolSizes;
 
-		VkDescriptorPool imguiPool;
-		if (vkCreateDescriptorPool(m_device.device(), &poolInfo, nullptr, &imguiPool) != VK_SUCCESS)
+		if (vkCreateDescriptorPool(m_device.device(), &poolInfo, nullptr, &m_imguiPool) != VK_SUCCESS)
 		{
 			throw std::runtime_error("unable to create imgui descriptor pool!");
 		}
 
 		// 2. initialize imgui
 		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		ImGui::StyleColorsDark();
+
+		m_window.windowInitImGui(true);
+		ImGui_ImplVulkan_InitInfo initInfo{};
+		m_device.setImguiInfo(initInfo);
+		initInfo.DescriptorPool = m_imguiPool;
+		initInfo.MinImageCount = 2;
+		initInfo.ImageCount = 2;
+		initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+		
+		ImGui_ImplVulkan_Init(&initInfo, m_swapchain->getRenderPass());
+
+		VkCommandBuffer fontCommandBuffer = m_device.beginSingleTimeCommands();
+
+		ImGui_ImplVulkan_CreateFontsTexture(fontCommandBuffer);
+
+		m_device.endSingleTimeCommands(fontCommandBuffer);
 	}
 	//  Interface end  ----------------------------------
 

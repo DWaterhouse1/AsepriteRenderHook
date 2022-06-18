@@ -3,6 +3,10 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+#include <imgui.h>
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_vulkan.h>
+
 // std
 #include <stdexcept>
 #include <string>
@@ -29,6 +33,7 @@ namespace wrengine
 		void resetWindowResizeFlag() { bFramebufferResized = false; }
 		VkExtent2D getExtent() { return { m_width, m_height }; }
 		void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
+		void windowInitImGui(bool installCallbacks) { ImGui_ImplGlfw_InitForVulkan(m_window, installCallbacks); }
 
 	private:
 		static void framebufferResizedCallback(GLFWwindow* window, int width, int height);

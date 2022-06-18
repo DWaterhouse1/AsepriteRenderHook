@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vulkan/vulkan.hpp>
-#include <imgui.h>
 
 #include "Pipeline.h"
 #include "Swapchain.h"
@@ -59,5 +58,6 @@ namespace wrengine
 		VkPipelineLayout m_pipelineLayout;
 		std::vector<Entity> m_entities;
 		std::vector<VkCommandBuffer> m_commandBuffers;
+		VkDescriptorPool m_imguiPool;
 	};
 } // namespace wrengine
