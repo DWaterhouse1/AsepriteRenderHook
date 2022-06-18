@@ -37,6 +37,7 @@ namespace wrengine
 	{
 		vkDestroyDescriptorPool(m_device.device(), m_imguiPool, nullptr);
 		ImGui_ImplVulkan_Shutdown();
+		ImGui::DestroyContext();
 		vkDestroyPipelineLayout(m_device.device(), m_pipelineLayout, nullptr);
 	}
 
@@ -117,6 +118,8 @@ namespace wrengine
 		// 2. initialize imgui
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 		ImGui::StyleColorsDark();
 
 		m_window.windowInitImGui(true);
@@ -149,8 +152,15 @@ namespace wrengine
 			ImGui_ImplGlfw_NewFrame();
 			ImGui::NewFrame();
 
-			ImGui::ShowDemoWindow();
+			//ImGui::ShowDemoWindow();
+
+			ImGui::Begin("Demo window");
+			ImGui::Button("hello!");
+			ImGui::End();
+
 			ImGui::Render();
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
 			drawFrame();
 		}
 		waitIdle();

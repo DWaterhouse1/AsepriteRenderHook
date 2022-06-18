@@ -119,6 +119,7 @@ namespace wrengine
 		}
 		return VkExtent2D();
 	}
+
 	VkFormat Swapchain::findDepthFormat()
 	{
 		return m_device.findSupportedFormat(
