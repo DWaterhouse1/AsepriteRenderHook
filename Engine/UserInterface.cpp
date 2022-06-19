@@ -70,7 +70,6 @@ namespace wrengine
     // upload the fonts using a single time command buffer
     VkCommandBuffer commandBuffer = device.beginSingleTimeCommands();
     ImGui_ImplVulkan_CreateFontsTexture(commandBuffer);
-    vkEndCommandBuffer(commandBuffer);
     device.endSingleTimeCommands(commandBuffer);
     ImGui_ImplVulkan_DestroyFontUploadObjects();
 	}

@@ -166,6 +166,8 @@ namespace wrengine
 
 	void Device::endSingleTimeCommands(VkCommandBuffer commandBuffer)
 	{
+		vkEndCommandBuffer(commandBuffer);
+
 		VkSubmitInfo submitInfo{};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 		submitInfo.commandBufferCount = 1;
