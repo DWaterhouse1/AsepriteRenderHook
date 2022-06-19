@@ -76,18 +76,34 @@ namespace wrengine
 		m_vertexCount = static_cast<uint32_t>(vertices.size());
 		assert(m_vertexCount >= 3 && "Vertex count must be at least 3");
 		VkDeviceSize bufferSize = sizeof(vertices[0]) * m_vertexCount;
+
+		VkBuffer stagingBuffer;
+		VkDeviceMemory stagingBufferMemory;
 		m_device.createBuffer(
 			bufferSize,
-			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			m_vertexBuffer,
-			m_vertexBufferMemory
+			stagingBuffer,
+			stagingBufferMemory
 			);
 
 		void* data;
-		vkMapMemory(m_device.device(), m_vertexBufferMemory, 0, bufferSize, 0, &data);
+		vkMapMemory(m_device.device(), stagingBufferMemory, 0, bufferSize, 0, &data);
 		memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
-		vkUnmapMemory(m_device.device(), m_vertexBufferMemory);
+		vkUnmapMemory(m_device.device(), stagingBufferMemory);
+
+		m_device.createBuffer(
+			bufferSize,
+			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+			m_vertexBuffer,
+			m_vertexBufferMemory
+		);
+
+		m_device.copyBuffer(stagingBuffer, m_vertexBuffer, bufferSize);
+
+		vkDestroyBuffer(m_device.device(), stagingBuffer, nullptr);
+		vkFreeMemory(m_device.device(), stagingBufferMemory, nullptr);
 	}
 
 	void Model::createIndexBuffers(const std::vector<uint32_t>& indices)
@@ -96,17 +112,33 @@ namespace wrengine
 		m_hasIndexBuffer = m_indexCount > 0;
 		if (!m_hasIndexBuffer) return;
 		VkDeviceSize bufferSize = sizeof(indices[0]) * m_indexCount;
+
+		VkBuffer stagingBuffer;
+		VkDeviceMemory stagingBufferMemory;
 		m_device.createBuffer(
 			bufferSize,
-			VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+			stagingBuffer,
+			stagingBufferMemory
+		);
+
+		void* data;
+		vkMapMemory(m_device.device(), stagingBufferMemory, 0, bufferSize, 0, &data);
+		memcpy(data, indices.data(), static_cast<size_t>(bufferSize));
+		vkUnmapMemory(m_device.device(), stagingBufferMemory);
+
+		m_device.createBuffer(
+			bufferSize,
+			VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
 			m_indexBuffer,
 			m_indexBufferMemory
 		);
 
-		void* data;
-		vkMapMemory(m_device.device(), m_indexBufferMemory, 0, bufferSize, 0, &data);
-		memcpy(data, indices.data(), static_cast<size_t>(bufferSize));
-		vkUnmapMemory(m_device.device(), m_indexBufferMemory);
+		m_device.copyBuffer(stagingBuffer, m_indexBuffer, bufferSize);
+
+		vkDestroyBuffer(m_device.device(), stagingBuffer, nullptr);
+		vkFreeMemory(m_device.device(), stagingBufferMemory, nullptr);
 	}
 }
