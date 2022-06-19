@@ -186,8 +186,6 @@ namespace wrengine
 		assert(m_isFrameStarted && "cannot end render pass when frame not in progress");
 		assert(commandBuffer == getCurrentCommandBuffer() && "can't end render pass on command buffer from a different frame");
 
-		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
-
 		vkCmdEndRenderPass(commandBuffer);
 	}
 

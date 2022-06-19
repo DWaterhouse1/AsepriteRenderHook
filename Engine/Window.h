@@ -34,6 +34,7 @@ namespace wrengine
 		VkExtent2D getExtent() { return { m_width, m_height }; }
 		void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 		void windowInitImGui(bool installCallbacks) { ImGui_ImplGlfw_InitForVulkan(m_window, installCallbacks); }
+		GLFWwindow* getGlfwWindow() { return m_window; }
 
 	private:
 		static void framebufferResizedCallback(GLFWwindow* window, int width, int height);

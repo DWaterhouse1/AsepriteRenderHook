@@ -46,6 +46,9 @@ namespace wrengine
 		VkSurfaceKHR surface() { return m_surface; }
 		VkQueue graphicsQueue() { return m_graphicsQueue; }
 		VkQueue presentQueue() { return m_presentQueue; }
+		VkInstance getInstance() { return m_instance; }
+		VkPhysicalDevice getPhysicalDevice() { return m_physicalDevice; }
+		uint32_t getGraphicsQueueFamily() { return findPhysicalQueueFamilies().graphicsFamily; }
 
 		SwapChainSupportDetails getSwapChainSupport() { return querySwapChainSupport(m_physicalDevice); }
 		uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
@@ -71,8 +74,6 @@ namespace wrengine
 			VkMemoryPropertyFlags properties,
 			VkImage& image,
 			VkDeviceMemory& imageMemory);
-
-		void setImguiInfo(ImGui_ImplVulkan_InitInfo& initInfo);
 
 		VkPhysicalDeviceProperties m_properties;
 

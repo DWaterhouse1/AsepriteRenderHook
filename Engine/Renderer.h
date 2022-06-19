@@ -2,10 +2,6 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_vulkan.h>
-
 #include "Swapchain.h"
 #include "Model.h"
 
@@ -38,6 +34,7 @@ namespace wrengine
 		VkRenderPass getSwapchainRenderPass() const { return m_swapchain->getRenderPass(); }
 		void waitIdle();
 		int getFrameIndex() const;
+		size_t getImageCount() { return m_swapchain->imageCount(); }
 
 	private:
 		// helper functions

@@ -58,7 +58,7 @@ add_library(${PROJECT_NAME}
   Model.cpp
   Entity.h
   Entity.cpp
-  Engine.h "Engine.cpp" "RenderSystem.h" "RenderSystem.cpp")
+  Engine.h "Engine.cpp" "RenderSystem.h" "RenderSystem.cpp" "UserInterface.h" "UserInterface.cpp")
 
 target_include_directories( ${PROJECT_NAME}
 	PUBLIC

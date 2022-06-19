@@ -2,14 +2,11 @@
 
 #include <vulkan/vulkan.hpp>
 
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_vulkan.h>
-
 #include "Device.h"
 #include "Renderer.h"
 #include "Model.h"
 #include "Entity.h"
+#include "UserInterface.h"
 
 //std
 #include <string>
@@ -33,10 +30,7 @@ namespace wrengine
 		Engine& operator=(const Engine&) = delete;
 
 		// interface
-		bool windowShouldClose();
-		void waitIdle();
-		void initImGui();
-		void mainLoop();
+		void run();
 
 	private:
 		// helper functions
@@ -53,6 +47,5 @@ namespace wrengine
 		Renderer m_renderer{ m_window, m_device };
 		VkPipelineLayout m_pipelineLayout;
 		std::vector<Entity> m_entities;
-		VkDescriptorPool m_imguiPool;
 	};
 } // namespace wrengine
