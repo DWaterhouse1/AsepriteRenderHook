@@ -65,20 +65,31 @@ namespace wrengine
 
 	void Engine::loadEntities()
 	{
-		std::vector<Model::Vertex> vertices
+		Model::VertexData vertexData{};
+		vertexData.vertices =
 		{
-			{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-			{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-			{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+			{{-0.5f, -0.5f}},
+			{{ 0.5f, -0.5f}},
+			{{-0.5f,  0.5f}},
+			{{ 0.5f,  0.5f}}
 		};
 
-		auto model = std::make_shared<Model>(m_device, vertices);
+		vertexData.indices = { 0, 1, 2, 3, 2, 1 };
+
+		//std::vector<Model::Vertex> vertices
+		//{
+		//	{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+		//	{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+		//	{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+		//};
+
+		auto model = std::make_shared<Model>(m_device, vertexData);
 
 		auto triangle = Entity::createEntity();
 		triangle.model = model;
 		triangle.color = { 0.1f, 0.8f, 0.1f };
-		triangle.transform2D.translation.x = 0.2f;
-		triangle.transform2D.scale = { 2.0f, 0.5f };
+		triangle.transform2D.translation.x = 0.0f;
+		triangle.transform2D.scale = { 1.0f, 1.0f };
 		triangle.transform2D.rotation = 0.25f * glm::two_pi<float>();
 		m_entities.push_back(std::move(triangle));
 	}
