@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Renderer.h"
+#include "Engine.h"
 #include "Window.h"
 
 // std
@@ -22,5 +22,5 @@ private:
 	const uint32_t WIDTH = 800;
 	const uint32_t HEIGHT = 600;
 	
-	wrengine::Renderer m_renderer{WIDTH, HEIGHT, "Aseprite Render Hook"};
+	wrengine::Engine m_engine{WIDTH, HEIGHT, "Aseprite Render Hook"};
 };

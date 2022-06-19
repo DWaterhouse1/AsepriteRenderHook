@@ -6,25 +6,21 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_vulkan.h>
 
-#include "Pipeline.h"
 #include "Swapchain.h"
 #include "Model.h"
-#include "Entity.h"
 
 //std
 #include <string>
 #include <memory>
 #include <vector>
+#include <cassert>
 
 namespace wrengine
 {
 	class Renderer
 	{
 	public:
-		Renderer(
-			const uint32_t width = 800,
-			const uint32_t height = 600,
-			const std::string& windowName = "wrengine");
+		Renderer(Window& window, Device& device);
 
 		~Renderer();
 
@@ -33,22 +29,25 @@ namespace wrengine
 		Renderer& operator=(const Renderer&) = delete;
 
 		// interface
-		bool windowShouldClose();
-		void drawFrame();
+		VkCommandBuffer beginFrame();
+		void endFrame();
+		void beginSwapchainRenderPass(VkCommandBuffer commandBuffer);
+		void endSwapchainRenderPass(VkCommandBuffer commandBuffer);
+		bool isFrameInProgress() const { return m_isFrameStarted; }
+		VkCommandBuffer getCurrentCommandBuffer() const;
+		VkRenderPass getSwapchainRenderPass() const { return m_swapchain->getRenderPass(); }
 		void waitIdle();
-		void initImGui();
-		void mainLoop();
+		int getFrameIndex() const;
 
 	private:
 		// helper functions
-		void loadEntities();
-		void createPipelineLayout();
-		void createPipeline();
 		void createCommandBuffers();
 		void freeCommandBuffers();
 		void recreateSwapchain();
-		void recordCommandBuffer(uint32_t imageIndex);
-		void renderEntities(VkCommandBuffer commandBuffer);
+
+		uint32_t m_currentImageIndex;
+		int m_currentFrameIndex = 0;
+		bool m_isFrameStarted = false;
 
 		// window params
 		uint32_t m_width = 800;
@@ -56,13 +55,9 @@ namespace wrengine
 		std::string m_windowName = "wrengine";
 
 		// vulkan/glfw structures
-		Window m_window{ m_width, m_height, m_windowName };
-		Device m_device{ m_window };
+		Window& m_window;
+		Device& m_device;
 		std::unique_ptr<Swapchain> m_swapchain;
-		std::unique_ptr<Pipeline> m_pipeline;
-		VkPipelineLayout m_pipelineLayout;
-		std::vector<Entity> m_entities;
 		std::vector<VkCommandBuffer> m_commandBuffers;;
-		VkDescriptorPool m_imguiPool;
 	};
 } // namespace wrengine

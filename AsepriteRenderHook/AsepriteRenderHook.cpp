@@ -7,22 +7,7 @@ AsepriteRenderHook::AsepriteRenderHook() {}
 
 void AsepriteRenderHook::run()
 {
-	m_renderer.initImGui();
-	m_renderer.mainLoop();
-}
-
-void AsepriteRenderHook::mainLoop()
-{
-	while (!m_renderer.windowShouldClose())
-	{
-		glfwPollEvents();
-
-		ImGui_ImplVulkan_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
-
-		ImGui::ShowDemoWindow();
-		m_renderer.drawFrame();
-	}
-	m_renderer.waitIdle();
+	m_engine.initImGui();
+	m_engine.mainLoop();
+	m_engine.waitIdle();
 }

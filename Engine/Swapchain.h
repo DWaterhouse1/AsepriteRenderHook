@@ -28,7 +28,8 @@ namespace wrengine
 		VkRenderPass getRenderPass() { return m_renderPass; }
 		VkImageView getImageView(int index) { return m_imageViews[index]; }
 		size_t imageCount() { return m_swapchainImages.size(); }
-		VkFormat getSwapChainImageFormat() { return m_swapchainImageFormat; }
+		VkFormat getSwapChainImageFormat() const { return m_swapchainImageFormat; }
+		VkFormat getSwapChainDepthFormat() const { return m_swapchainDepthFormat; }
 		VkExtent2D getSwapChainExtent() { return m_swapchainExtent; }
 		uint32_t width() { return m_swapchainExtent.width; }
 		uint32_t height() { return m_swapchainExtent.height; }
@@ -38,6 +39,7 @@ namespace wrengine
 		float extentAspectRatio();
 		VkResult acquireNextImage(uint32_t* imageIndex);
 		VkResult submitCommandBuffers(const VkCommandBuffer* buffers, uint32_t* imageIndex);
+		bool compareSwapFormats(const Swapchain&) const;
 		
 	private:
 		void init();
@@ -58,6 +60,7 @@ namespace wrengine
 		VkExtent2D m_extent;
 		VkSwapchainKHR m_swapchain;
 		VkFormat m_swapchainImageFormat;
+		VkFormat m_swapchainDepthFormat;
 		VkExtent2D m_swapchainExtent;
 		VkRenderPass m_renderPass;
 		std::shared_ptr<Swapchain> m_oldSwapchain;
