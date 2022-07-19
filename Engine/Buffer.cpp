@@ -40,7 +40,8 @@ namespace wrengine {
     instanceSize{ instanceSize },
     instanceCount{ instanceCount },
     usageFlags{ usageFlags },
-    memoryPropertyFlags{ memoryPropertyFlags } {
+    memoryPropertyFlags{ memoryPropertyFlags }
+  {
     alignmentSize = getAlignment(instanceSize, minOffsetAlignment);
     bufferSize = alignmentSize * instanceCount;
     device.createBuffer(bufferSize, usageFlags, memoryPropertyFlags, buffer, memory);

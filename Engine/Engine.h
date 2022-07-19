@@ -6,12 +6,16 @@
 #include "Renderer.h"
 #include "Model.h"
 #include "Entity.h"
+#include "Descriptors.h"
 #include "UserInterface.h"
+#include "Texture.h"
 
 //std
 #include <string>
 #include <memory>
 #include <vector>
+#include <set>
+#include <map>
 
 namespace wrengine
 {
@@ -30,10 +34,13 @@ namespace wrengine
 		Engine& operator=(const Engine&) = delete;
 
 		// interface
+		void addTextureDependency(std::string handle, std::string filePath);
+		void addTextureDependency(std::set<std::pair<std::string, std::string>> filePaths);
 		void run();
 
 	private:
-		// helper functions
+		// initialization functions
+		void loadTextures();
 		void loadEntities();
 
 		// window params
@@ -46,6 +53,11 @@ namespace wrengine
 		Device m_device{ m_window };
 		Renderer m_renderer{ m_window, m_device };
 		VkPipelineLayout m_pipelineLayout;
+
+		// note that the pool depends on the device, and must be cleaned up first
+		std::unique_ptr<DescriptorPool> m_globalDescriptorPool{};
+		std::set<std::pair<std::string, std::string>> m_textureDefinitions;
+		std::map<std::string, std::shared_ptr<Texture>> m_textures;
 		std::vector<Entity> m_entities;
 	};
 } // namespace wrengine

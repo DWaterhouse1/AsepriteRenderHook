@@ -77,7 +77,7 @@ namespace wrengine
 			SimplePushConstantData push{};
 			push.offset = entity.transform2D.translation;
 			push.color = entity.color;
-			push.transform = entity.transform2D.mat2();//entity.transform2D.mat2();
+			push.transform = entity.transform2D.mat2();
 
 			vkCmdPushConstants(
 				commandBuffer,

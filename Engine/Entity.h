@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Model.h"
+#include "Texture.h"
 
 // std
 #include <memory>
@@ -33,6 +34,7 @@ namespace wrengine
 		Entity& operator=(Entity&&) = default;
 
 		std::shared_ptr<Model> model{};
+		std::shared_ptr<Texture> texture{};
 		glm::vec3 color{};
 		Transform2DComponent transform2D{};
 

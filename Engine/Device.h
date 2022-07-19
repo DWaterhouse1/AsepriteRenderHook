@@ -49,6 +49,7 @@ namespace wrengine
 		VkInstance getInstance() { return m_instance; }
 		VkPhysicalDevice getPhysicalDevice() { return m_physicalDevice; }
 		uint32_t getGraphicsQueueFamily() { return findPhysicalQueueFamilies().graphicsFamily; }
+		VkPhysicalDeviceProperties getPhysicalDeviceProperties() { return m_properties; }
 
 		SwapChainSupportDetails getSwapChainSupport() { return querySwapChainSupport(m_physicalDevice); }
 		uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
@@ -74,8 +75,6 @@ namespace wrengine
 			VkMemoryPropertyFlags properties,
 			VkImage& image,
 			VkDeviceMemory& imageMemory);
-
-		VkPhysicalDeviceProperties m_properties;
 
 	private:
 		void createInstance();
@@ -104,6 +103,7 @@ namespace wrengine
 		VkDevice m_device;
 		VkQueue m_graphicsQueue;
 		VkQueue m_presentQueue;
+		VkPhysicalDeviceProperties m_properties;
 
 		const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
 		const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };

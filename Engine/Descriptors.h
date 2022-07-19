@@ -43,7 +43,8 @@ namespace wrengine
 		DescriptorSetLayout& operator=(const DescriptorSetLayout&) = delete;
 
 		// getters
-		VkDescriptorSetLayout getDescriptorSetLayout() const { return m_descriptorSetLayout; }
+		VkDescriptorSetLayout getDescriptorSetLayout() const
+		{ return m_descriptorSetLayout; }
 
 	private:
 		Device& m_device;
@@ -106,8 +107,13 @@ namespace wrengine
 	public:
 		DescriptorWriter(DescriptorSetLayout& setLayout, DescriptorPool& pool);
 
-		DescriptorWriter& writeBuffer(uint32_t binding, VkDescriptorBufferInfo* bufferInfo);
-		DescriptorWriter& writeImage(uint32_t binding, VkDescriptorImageInfo* imageInfo);
+		DescriptorWriter& writeBuffer(
+			uint32_t binding,
+			VkDescriptorBufferInfo* bufferInfo);
+
+		DescriptorWriter& writeImage(
+			uint32_t binding,
+			VkDescriptorImageInfo* imageInfo);
 
 		bool build(VkDescriptorSet& set);
 		void overwrite(VkDescriptorSet& set);

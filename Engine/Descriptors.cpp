@@ -131,7 +131,8 @@ namespace wrengine
 		allocInfo.pSetLayouts = &descriptorSetlayout;
 		allocInfo.descriptorSetCount = 1;
 
-		if (vkAllocateDescriptorSets(m_device.device(), &allocInfo, &descriptor) != VK_SUCCESS)
+		if (vkAllocateDescriptorSets(m_device.device(), &allocInfo, &descriptor)
+			!= VK_SUCCESS)
 		{
 			return false;
 		}
@@ -168,7 +169,8 @@ namespace wrengine
 		assert(
 			m_descriptorSetLayout.m_bindings.count(binding) == 1 &&
 			"layout does not contain specified binding");
-		VkDescriptorSetLayoutBinding& bindingDescription = m_descriptorSetLayout.m_bindings[binding];
+		VkDescriptorSetLayoutBinding& bindingDescription =
+			m_descriptorSetLayout.m_bindings[binding];
 
 		assert(
 			bindingDescription.descriptorCount == 1 &&
@@ -185,12 +187,15 @@ namespace wrengine
 		return *this;
 	}
 
-	DescriptorWriter& DescriptorWriter::writeImage(uint32_t binding, VkDescriptorImageInfo* imageInfo)
+	DescriptorWriter& DescriptorWriter::writeImage(
+		uint32_t binding,
+		VkDescriptorImageInfo* imageInfo)
 	{
 		assert(
 			m_descriptorSetLayout.m_bindings.count(binding) == 1 &&
 			"layout does not contain specified binding");
-		VkDescriptorSetLayoutBinding& bindingDescription = m_descriptorSetLayout.m_bindings[binding];
+		VkDescriptorSetLayoutBinding& bindingDescription =
+			m_descriptorSetLayout.m_bindings[binding];
 
 		assert(
 			bindingDescription.descriptorCount == 1 &&
@@ -209,7 +214,10 @@ namespace wrengine
 
 	bool DescriptorWriter::build(VkDescriptorSet& set)
 	{
-		bool success = m_pool.allocateDescriptor(m_descriptorSetLayout.getDescriptorSetLayout(), set);
+		bool success = m_pool.allocateDescriptor(
+			m_descriptorSetLayout.getDescriptorSetLayout(),
+			set);
+
 		if (!success) return false;
 		overwrite(set);
 		return true;

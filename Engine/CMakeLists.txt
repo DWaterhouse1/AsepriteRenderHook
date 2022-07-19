@@ -44,6 +44,9 @@ if(NOT imgui_FOUND)
   message(STATUS "could not find imgui using vcpkg")
 endif()
 
+# stb
+find_path(STB_INCLUDE_DIRS "stb_c_lexer.h")
+
 add_library(${PROJECT_NAME}
   Renderer.cpp
   Pipeline.h
@@ -66,7 +69,10 @@ add_library(${PROJECT_NAME}
   UserInterface.cpp
   Buffer.h
   Buffer.cpp
- "Descriptors.h" "Descriptors.cpp")
+  Descriptors.h
+  Descriptors.cpp
+  Texture.h
+  Texture.cpp)
 
 target_include_directories( ${PROJECT_NAME}
 	PUBLIC
@@ -74,6 +80,7 @@ target_include_directories( ${PROJECT_NAME}
 		${Vulkan_INCLUDE_DIRS}
    	${GLFW_INCLUDE_DIRS}
     ${GLM_PATH}
+    ${STB_INCLUDE_DIRS}
 )
 
 target_link_directories(${PROJECT_NAME}
