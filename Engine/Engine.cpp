@@ -14,12 +14,15 @@
 #include <array>
 #include <iostream>
 #include <tuple>
+#include <chrono>
 
 namespace wrengine
 {
 struct GlobalUbo
 {
-	glm::vec3 lightDirection = glm::normalize(glm::vec3{ 1.0f, -3.0f, 1.0f });
+	//glm::mat2 transform{ 1.0f };
+	//glm::vec4 offset{ 0.0f };
+	glm::vec4 color{ 1.0f, 1.0f, 0.0f, 1.0f};
 };
 
 	Engine::Engine(
@@ -39,7 +42,6 @@ struct GlobalUbo
 			.build();
 
 		loadEntities();
-		
 	}
 
 	Engine::~Engine()
@@ -50,6 +52,7 @@ struct GlobalUbo
 	void Engine::run()
 	{
 		loadTextures();
+
 		std::vector<std::unique_ptr<Buffer>> uboBuffers(
 			Swapchain::MAX_FRAMES_IN_FLIGHT);
 		for (int i = 0; i < uboBuffers.size(); ++i)
@@ -81,7 +84,11 @@ struct GlobalUbo
 				.build(globalDescriptorSets[i]);
 		}
 
-		RenderSystem renderSystem{ m_device, m_renderer.getSwapchainRenderPass() };
+		RenderSystem renderSystem{ 
+			m_device,
+			m_renderer.getSwapchainRenderPass(),
+			globalSetLayout->getDescriptorSetLayout()
+		};
 
 		UserInterface userInterface{
 			m_window,
@@ -90,14 +97,48 @@ struct GlobalUbo
 			static_cast<uint32_t>(m_renderer.getImageCount())
 		};
 
+		std::chrono::steady_clock::time_point currentTime =
+			std::chrono::high_resolution_clock::now();
+
 		while (!m_window.shouldClose())
 		{
+			// note glfwPollEvents() may block, e.g. on window resize
 			glfwPollEvents();
-			if (auto commandBuffer = m_renderer.beginFrame())
+
+			// -------------- frame timing --------------
+			std::chrono::steady_clock::time_point newTime =
+				std::chrono::high_resolution_clock::now();
+			
+			float frameTime = 
+				std::chrono::duration<float, std::chrono::seconds::period>(
+					newTime - currentTime)
+				.count();
+			currentTime = newTime;
+
+			// -------------  begin frame --------------
+			if (VkCommandBuffer commandBuffer = m_renderer.beginFrame())
 			{
+				int frameIndex = m_renderer.getFrameIndex();
+				FrameInfo frameInfo
+				{
+					frameIndex,
+					frameTime,
+					commandBuffer,
+					globalDescriptorSets[frameIndex]
+				};
+
+				// FRAME PHASE 1
+				// prepare and update objects in memory
+				GlobalUbo ubo{};
+				ubo.color = glm::vec4(0.0f, 1.0f, 1.0f, 1.0f);
+				uboBuffers[frameIndex]->writeToBuffer(&ubo);
+				uboBuffers[frameIndex]->flush();
+
+				// FRAME PHASE 2
+				// render the frame
 				userInterface.startFrame();
 				m_renderer.beginSwapchainRenderPass(commandBuffer);
-				renderSystem.renderEntities(commandBuffer, m_entities);
+				renderSystem.renderEntities(frameInfo, m_entities);
 				userInterface.runExample();
 				userInterface.render(commandBuffer);
 				m_renderer.endSwapchainRenderPass(commandBuffer);
@@ -124,7 +165,7 @@ struct GlobalUbo
 		for (auto [handle, filePath] : m_textureDefinitions)
 		{
 			m_textures.emplace(handle, std::make_shared<Texture>(m_device));
-			m_textures[handle]->loadFromFile(handle);
+			m_textures[handle]->loadFromFile(filePath);
 		}
 	}
 

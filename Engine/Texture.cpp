@@ -37,8 +37,11 @@ void Texture::loadFromFile(std::string filePath)
 		m_stbiData = nullptr;
 	}
 
+	const char* cstrFilePath = filePath.c_str();
+	std::cout << cstrFilePath << "\n";
+
 	m_stbiData = stbi_load(
-		filePath.c_str(),
+		cstrFilePath,
 		&m_width,
 		&m_height,
 		&m_numChannels,
@@ -47,7 +50,9 @@ void Texture::loadFromFile(std::string filePath)
 	if (stbi_failure_reason())
 	{
 		throw std::runtime_error(
-			"failed to load texture: " +
+			"failed to load texture at " +
+			filePath +
+			" - " +
 			std::string(stbi_failure_reason()));
 	}
 

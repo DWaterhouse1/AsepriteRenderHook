@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma once
-
 #include <vulkan/vulkan.hpp>
 
 #include <imgui.h>
@@ -12,6 +10,7 @@
 #include "Pipeline.h"
 #include "Model.h"
 #include "Entity.h"
+#include "FrameInfo.h"
 
 //std
 #include <string>
@@ -23,7 +22,10 @@ namespace wrengine
 	class RenderSystem
 	{
 	public:
-		RenderSystem(Device& device, VkRenderPass renderPass);
+		RenderSystem(
+			Device& device,
+			VkRenderPass renderPass,
+			VkDescriptorSetLayout globalSetLayout);
 
 		~RenderSystem();
 
@@ -32,11 +34,13 @@ namespace wrengine
 		RenderSystem& operator=(const RenderSystem&) = delete;
 
 		// interface
-		void renderEntities(VkCommandBuffer commandBuffer, std::vector<Entity>& entities);
+		void renderEntities(
+			const FrameInfo& frameInfo,
+			std::vector<Entity>& entities);
 
 	private:
 		// helper functions
-		void createPipelineLayout();
+		void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
 		void createPipeline(VkRenderPass renderPass);
 
 		// vulkan/glfw structures
