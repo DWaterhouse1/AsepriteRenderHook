@@ -22,6 +22,7 @@ public:
 	Texture& operator=(const Texture&) = delete;
 
 	void loadFromFile(std::string filePath);
+	VkDescriptorImageInfo descriptorInfo();
 
 private:
 	void createTextureBuffer();

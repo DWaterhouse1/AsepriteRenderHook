@@ -94,9 +94,9 @@ void RenderSystem::renderEntities(
 
 	for (auto& entity : entities)
 	{
-		entity.transform2D.rotation = glm::mod(
-			entity.transform2D.rotation + 0.001f,
-			glm::two_pi<float>());
+		//entity.transform2D.rotation = glm::mod(
+		//	entity.transform2D.rotation + 0.001f,
+		//	glm::two_pi<float>());
 
 		SimplePushConstantData push{};
 		push.offset = entity.transform2D.translation;

@@ -35,13 +35,14 @@ struct GlobalUbo
 	{
 		m_globalDescriptorPool = 
 			DescriptorPool::Builder(m_device)
-			.setMaxSets(Swapchain::MAX_FRAMES_IN_FLIGHT)
+			.setMaxSets(Swapchain::MAX_FRAMES_IN_FLIGHT * 2)
 			.addPoolSize(
 				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 				Swapchain::MAX_FRAMES_IN_FLIGHT)
+			.addPoolSize(
+				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+				Swapchain::MAX_FRAMES_IN_FLIGHT)
 			.build();
-
-		loadEntities();
 	}
 
 	Engine::~Engine()
@@ -52,6 +53,7 @@ struct GlobalUbo
 	void Engine::run()
 	{
 		loadTextures();
+		loadEntities();
 
 		std::vector<std::unique_ptr<Buffer>> uboBuffers(
 			Swapchain::MAX_FRAMES_IN_FLIGHT);
@@ -71,6 +73,10 @@ struct GlobalUbo
 				0,
 				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 				VK_SHADER_STAGE_VERTEX_BIT)
+			.addBinding(
+				1,
+				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+				VK_SHADER_STAGE_FRAGMENT_BIT)
 			.build();
 		
 		std::vector<VkDescriptorSet> globalDescriptorSets(
@@ -79,8 +85,11 @@ struct GlobalUbo
 		for (int i = 0; i < globalDescriptorSets.size(); ++i)
 		{
 			VkDescriptorBufferInfo bufferInfo = uboBuffers[i]->descriptorInfo();
+			VkDescriptorImageInfo imageInfo = m_textures["texture"]->descriptorInfo();
+
 			DescriptorWriter(*globalSetLayout, *m_globalDescriptorPool)
 				.writeBuffer(0, &bufferInfo)
+				.writeImage(1, &imageInfo)
 				.build(globalDescriptorSets[i]);
 		}
 
@@ -172,15 +181,30 @@ struct GlobalUbo
 	void Engine::loadEntities()
 	{
 		Model::VertexData vertexData{};
+		//vertexData.vertices =
+		//{
+		//	{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}}, // top right
+		//	{{ 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+		//	{{ 0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}}, // bottom left
+		//	{{-0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
+		//};
+
+		//vertexData.vertices =
+		//{
+		//	{ { 0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+		//	{ { 0.5f,  0.5f}, {0.0f, 1.0f, 0.0f}},
+		//	{ {-0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}},
+		//};
+
 		vertexData.vertices =
 		{
-			{{-0.5f, -0.5f}},
-			{{ 0.5f, -0.5f}},
-			{{-0.5f,  0.5f}},
-			{{ 0.5f,  0.5f}}
+			{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+			{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+			{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+			{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
 		};
 
-		vertexData.indices = { 0, 1, 2, 3, 2, 1 };
+		vertexData.indices = { 0, 1, 2, 2, 3, 0 };
 
 		//std::vector<Model::Vertex> vertices
 		//{
@@ -195,7 +219,7 @@ struct GlobalUbo
 
 		auto triangle = Entity::createEntity();
 		triangle.model = model;
-		//triangle.texture = m_textures["bird"];
+		triangle.texture = m_textures["texture"];
 		//triangle.texture = texture;
 		triangle.color = { 0.1f, 0.8f, 0.1f };
 		triangle.transform2D.translation.x = 0.0f;

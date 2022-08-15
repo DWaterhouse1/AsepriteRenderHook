@@ -8,7 +8,7 @@ AsepriteRenderHook::AsepriteRenderHook() {}
 void AsepriteRenderHook::run()
 {
 	m_engine.addTextureDependency({
-			{"texture", "bird.png"},
+			{"texture", "landscape.png"},
 		});
 	m_engine.run();
 }

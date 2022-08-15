@@ -59,6 +59,15 @@ void Texture::loadFromFile(std::string filePath)
 	createTextureBuffer();
 }
 
+VkDescriptorImageInfo Texture::descriptorInfo()
+{
+	VkDescriptorImageInfo imageInfo{};
+	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	imageInfo.imageView = m_textureImageView;
+	imageInfo.sampler = m_textureSampler;
+	return imageInfo;
+}
+
 void Texture::createTextureBuffer()
 {
 	uint32_t imageSize = m_width * m_height;
@@ -117,6 +126,7 @@ void Texture::createTextureBuffer()
 		VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	createTextureSampler();
+	createImageView();
 }
 
 void Texture::createImage()
