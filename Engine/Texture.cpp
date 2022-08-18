@@ -29,6 +29,10 @@ Texture::~Texture()
 	vkFreeMemory(m_device.device(), m_textureImageMemory, nullptr);
 }
 
+/**
+* Loads an image from file into Vulkan texture structures Will throw a runtime
+* error on failure to read the image.
+*/
 void Texture::loadFromFile(std::string filePath)
 {
 	if (m_stbiData)
@@ -59,6 +63,9 @@ void Texture::loadFromFile(std::string filePath)
 	createTextureBuffer();
 }
 
+/**
+* Gets the VkDescriptorImageInfo for use with this Texture.
+*/
 VkDescriptorImageInfo Texture::descriptorInfo()
 {
 	VkDescriptorImageInfo imageInfo{};
@@ -68,6 +75,9 @@ VkDescriptorImageInfo Texture::descriptorInfo()
 	return imageInfo;
 }
 
+/**
+* Creates the buffer structures to hold the texture data.
+*/
 void Texture::createTextureBuffer()
 {
 	uint32_t imageSize = m_width * m_height;
@@ -129,6 +139,9 @@ void Texture::createTextureBuffer()
 	createImageView();
 }
 
+/**
+* Creates the texture image.
+*/
 void Texture::createImage()
 {
 	VkImageCreateInfo imageInfo{};
@@ -156,6 +169,14 @@ void Texture::createImage()
 		m_textureImageMemory);
 }
 
+/**
+* Transitions the texture image between memory layouts. Will throw a runtime
+* error if the layout transition is unsupported.
+* 
+* @param format Image format.
+* @param oldLayout The layout that the image is transitioning from.
+* @param newLayout The target image layout that the image is transitioning to.
+*/
 void Texture::transitionImageLayout(
 	VkFormat format,
 	VkImageLayout oldLayout,
@@ -216,6 +237,10 @@ void Texture::transitionImageLayout(
 	m_device.endSingleTimeCommands(commandBuffer);
 }
 
+/**
+* Creates the image view for this texture image. Will throw a runtime error if
+* unsuccessful.
+*/
 void Texture::createImageView()
 {
 	VkImageViewCreateInfo viewInfo{};
@@ -239,6 +264,10 @@ void Texture::createImageView()
 	}
 }
 
+/**
+* Creates the sampler object for using this texutre in shaders. Will throw a
+* runtime error if unsuccessful.
+*/
 void Texture::createTextureSampler()
 {
 	VkSamplerCreateInfo samplerInfo{};
@@ -272,5 +301,4 @@ void Texture::createTextureSampler()
 		throw std::runtime_error("failed to create texture sampler!");
 	}
 }
-
 } // namespace wrengine

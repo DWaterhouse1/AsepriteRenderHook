@@ -11,3 +11,5 @@ build/**
 textures_
 imgui.ini
 *.env.cmake
+/doxygen_*
+doxygen*

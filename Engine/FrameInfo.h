@@ -4,6 +4,9 @@
 
 namespace wrengine
 {
+/**
+* Struct containing per frame information.
+*/
 struct FrameInfo
 {
 	int frameIndex;

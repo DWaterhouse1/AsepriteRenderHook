@@ -10,6 +10,9 @@
 #include <array>
 #include <iostream>
 
+/**
+* Simple struct for push constants. Contains transform, offset and color data.
+*/
 struct SimplePushConstantData
 {
 	glm::mat2 transform{ 1.0f };
@@ -22,8 +25,8 @@ namespace wrengine
 RenderSystem::RenderSystem(
 	Device& device,
 	VkRenderPass renderPass,
-	VkDescriptorSetLayout globalSetLayout)
-	: m_device{ device }
+	VkDescriptorSetLayout globalSetLayout) :
+	m_device{ device }
 {
 	createPipelineLayout(globalSetLayout);
 	createPipeline(renderPass);
@@ -34,6 +37,12 @@ RenderSystem::~RenderSystem()
 	vkDestroyPipelineLayout(m_device.device(), m_pipelineLayout, nullptr);
 }
 
+/**
+* Creates a pipeline layout owned by the render system acording to supplied
+* descriptor set layouts.
+* 
+* @param globalSetLayout The current global descriptor set layout.
+*/
 void RenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout)
 {
 	VkPushConstantRange pushConstantRange{};
@@ -61,6 +70,12 @@ void RenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout)
 	}
 }
 
+/**
+* Creates a pipeline object owned by the render system, using hardcoded shader
+* file paths.
+* 
+* @param renderPass The render pass object to use in pipeline configuration.
+*/
 void RenderSystem::createPipeline(VkRenderPass renderPass)
 {
 	assert(m_pipelineLayout != nullptr &&
@@ -74,10 +89,15 @@ void RenderSystem::createPipeline(VkRenderPass renderPass)
 		m_device,
 		"shaders/simple_shader.vert.spv",
 		"shaders/simple_shader.frag.spv",
-		pipelineConfig
-		);
+		pipelineConfig);
 }
 
+/**
+* Submids command to render the provided Entity objects.
+* 
+* @param frameInfo Structure describing relevent current frame information.
+* @param entities Vector of Entity objects to render.
+*/
 void RenderSystem::renderEntities(
 	const FrameInfo& frameInfo,
 	std::vector<Entity>& entities)

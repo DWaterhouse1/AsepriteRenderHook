@@ -19,33 +19,37 @@
 
 namespace wrengine
 {
-	class RenderSystem
-	{
-	public:
-		RenderSystem(
-			Device& device,
-			VkRenderPass renderPass,
-			VkDescriptorSetLayout globalSetLayout);
+/**
+* Simple system to specify a rendering structure, and configure a corresponding
+* pipeline object.
+*/
+class RenderSystem
+{
+public:
+	RenderSystem(
+		Device& device,
+		VkRenderPass renderPass,
+		VkDescriptorSetLayout globalSetLayout);
 
-		~RenderSystem();
+	~RenderSystem();
 
-		// should not copy
-		RenderSystem(const RenderSystem&) = delete;
-		RenderSystem& operator=(const RenderSystem&) = delete;
+	// should not copy
+	RenderSystem(const RenderSystem&) = delete;
+	RenderSystem& operator=(const RenderSystem&) = delete;
 
-		// interface
-		void renderEntities(
-			const FrameInfo& frameInfo,
-			std::vector<Entity>& entities);
+	// interface
+	void renderEntities(
+		const FrameInfo& frameInfo,
+		std::vector<Entity>& entities);
 
-	private:
-		// helper functions
-		void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
-		void createPipeline(VkRenderPass renderPass);
+private:
+	// helper functions
+	void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
+	void createPipeline(VkRenderPass renderPass);
 
-		// vulkan/glfw structures
-		Device& m_device;
-		std::unique_ptr<Pipeline> m_pipeline;
-		VkPipelineLayout m_pipelineLayout;
-	};
+	// vulkan/glfw structures
+	Device& m_device;
+	std::unique_ptr<Pipeline> m_pipeline;
+	VkPipelineLayout m_pipelineLayout;
+};
 } // namespace wrengine

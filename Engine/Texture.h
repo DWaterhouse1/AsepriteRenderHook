@@ -11,6 +11,11 @@
 
 namespace wrengine
 {
+/**
+* Encapsulation of texture resources. Can read images from file and load into
+* the Vulkan image and image memory structures. Provides image views and texture
+* samplers for use of the texture within a shader.
+*/
 class Texture
 {
 public:
