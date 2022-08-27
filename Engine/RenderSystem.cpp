@@ -9,15 +9,17 @@
 #include <stdexcept>
 #include <array>
 #include <iostream>
+#include <cmath>
 
 /**
 * Simple struct for push constants. Contains transform, offset and color data.
 */
 struct SimplePushConstantData
 {
-	glm::mat2 transform{ 1.0f };
-	glm::vec2 offset;
-	alignas(16) glm::vec3 color;
+	glm::vec4 lightDir{};
+	//glm::mat2 transform{ 1.0f };
+	//glm::vec2 offset;
+	//alignas(16) glm::vec3 color;
 };
 
 namespace wrengine
@@ -83,6 +85,9 @@ void RenderSystem::createPipeline(VkRenderPass renderPass)
 
 	PipelineConfigInfo pipelineConfig{};
 	Pipeline::defaultPipelineConfigInfo(pipelineConfig);
+	pipelineConfig.colorBlendAttachment.blendEnable = VK_TRUE;
+	pipelineConfig.colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+	pipelineConfig.colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA;
 	pipelineConfig.renderPass = renderPass;
 	pipelineConfig.pipelineLayout = m_pipelineLayout;
 	m_pipeline = std::make_unique<Pipeline>(
@@ -93,7 +98,7 @@ void RenderSystem::createPipeline(VkRenderPass renderPass)
 }
 
 /**
-* Submids command to render the provided Entity objects.
+* Submits command to render the provided Entity objects.
 * 
 * @param frameInfo Structure describing relevent current frame information.
 * @param entities Vector of Entity objects to render.
@@ -118,10 +123,22 @@ void RenderSystem::renderEntities(
 		//	entity.transform2D.rotation + 0.001f,
 		//	glm::two_pi<float>());
 
+		static float light{};
+
+		light += 0.001f;
+		light = std::fmod(light, 360.0f);
+		
 		SimplePushConstantData push{};
-		push.offset = entity.transform2D.translation;
-		push.color = entity.color;
-		push.transform = entity.transform2D.mat2();
+		//push.offset = entity.transform2D.translation;
+		//push.color = entity.color;
+		//push.transform = entity.transform2D.mat2();
+
+		float s = glm::sin(light);
+		float c = glm::cos(light);
+		float radius = 2.0f;
+		float height = 2.0f;
+
+		push.lightDir = glm::vec4(radius * s, radius * c, height, 0.0f);
 
 		vkCmdPushConstants(
 			frameInfo.commandBuffer,

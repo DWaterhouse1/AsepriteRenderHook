@@ -76,6 +76,57 @@ VkDescriptorImageInfo Texture::descriptorInfo()
 }
 
 /**
+* Updates the texture object on device memory to use new data. Supports 512x512
+* RGBA8888 data only.
+* 
+* @param data Pointer to new texture data.
+*/
+void Texture::updateTextureData(void* data)
+{
+	// sync by waiting for device
+	vkDeviceWaitIdle(m_device.device());
+
+	//TODO fix this to write to the image buffer properly, rather than staging
+	uint32_t imageSize = m_width * m_height;
+	VkDeviceSize pixelSize = 4 * sizeof(unsigned char);
+	VkDeviceSize bufferSize = pixelSize * imageSize;
+
+	Buffer stagingBuffer{
+	m_device,
+	pixelSize,
+	imageSize,
+	VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+	VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+	};
+
+	stagingBuffer.map();
+	stagingBuffer.writeToBuffer(m_stbiData);
+
+	m_device.copyBuffer(
+		stagingBuffer.getBuffer(),
+		m_textureBuffer->getBuffer(),
+		bufferSize);
+
+	transitionImageLayout(
+		VK_FORMAT_R8G8B8A8_SRGB,
+		VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+	m_device.copyBufferToImage(
+		m_textureBuffer->getBuffer(),
+		m_textureImage,
+		static_cast<uint32_t>(m_width),
+		static_cast<uint32_t>(m_height),
+		1);
+
+	// transition back to read only optimal so we can sample from shaders
+	transitionImageLayout(
+		VK_FORMAT_R8G8B8A8_SRGB,
+		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+		VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+}
+
+/**
 * Creates the buffer structures to hold the texture data.
 */
 void Texture::createTextureBuffer()
@@ -100,8 +151,7 @@ void Texture::createTextureBuffer()
 		pixelSize,
 		imageSize,
 		VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
-		);
+		VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
 	m_device.copyBuffer(
 		stagingBuffer.getBuffer(),
@@ -129,7 +179,7 @@ void Texture::createTextureBuffer()
 		static_cast<uint32_t>(m_height),
 		1);
 
-	// transition back to sate so we can sample from shaders
+	// transition back to read only optimal so we can sample from shaders
 	transitionImageLayout(
 		VK_FORMAT_R8G8B8A8_SRGB,
 		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,

@@ -7,8 +7,26 @@ AsepriteRenderHook::AsepriteRenderHook() {}
 
 void AsepriteRenderHook::run()
 {
-	m_engine.addTextureDependency({
-			{"texture", "landscape.png"},
-		});
+	initServer();
+	initEngine();
 	m_engine.run();
+}
+
+void AsepriteRenderHook::initServer()
+{
+	m_server.bindMessageHandler(&messageHandler);
+}
+
+void AsepriteRenderHook::initEngine()
+{
+	m_engine.addTextureDependency(
+		{
+			{"albedo", "Gemstone_Albedo.png"},
+			{"normal", "Gemstone_Normal.png"},
+		});
+}
+
+void AsepriteRenderHook::messageHandler(WebsocketServer::MessageType message)
+{
+
 }

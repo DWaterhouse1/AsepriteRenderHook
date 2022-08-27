@@ -84,6 +84,10 @@ void Engine::run()
 			1,
 			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 			VK_SHADER_STAGE_FRAGMENT_BIT)
+		.addBinding(
+			2,
+			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			VK_SHADER_STAGE_FRAGMENT_BIT)
 		.build();
 	
 	std::vector<VkDescriptorSet> globalDescriptorSets(
@@ -92,11 +96,13 @@ void Engine::run()
 	for (int i = 0; i < globalDescriptorSets.size(); ++i)
 	{
 		VkDescriptorBufferInfo bufferInfo = uboBuffers[i]->descriptorInfo();
-		VkDescriptorImageInfo imageInfo = m_textures["texture"]->descriptorInfo();
+		VkDescriptorImageInfo albedoInfo = m_textures["albedo"]->descriptorInfo();
+		VkDescriptorImageInfo normalMapInfo = m_textures["normal"]->descriptorInfo();
 
 		DescriptorWriter(*globalSetLayout, *m_globalDescriptorPool)
 			.writeBuffer(0, &bufferInfo)
-			.writeImage(1, &imageInfo)
+			.writeImage(1, &albedoInfo)
+			.writeImage(2, &normalMapInfo)
 			.build(globalDescriptorSets[i]);
 	}
 
@@ -249,7 +255,7 @@ void Engine::loadEntities()
 
 	Entity triangle = Entity::createEntity();
 	triangle.model = model;
-	triangle.texture = m_textures["texture"];
+	triangle.texture = m_textures["albedo"];
 	//triangle.texture = texture;
 	triangle.color = { 0.1f, 0.8f, 0.1f };
 	triangle.transform2D.translation.x = 0.0f;

@@ -14,9 +14,10 @@ layout(set = 0, binding = 0) uniform GlobalUbo
 
 layout(push_constant) uniform Push
 {
-	mat2 transform;
-	vec2 offset;
-	vec3 color;
+	vec4 lightDir;
+	//mat2 transform;
+	//vec2 offset;
+	//vec3 color;
 } push;
 
 void main()

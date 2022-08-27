@@ -28,6 +28,7 @@ public:
 
 	void loadFromFile(std::string filePath);
 	VkDescriptorImageInfo descriptorInfo();
+	void updateTextureData(void* data);
 
 private:
 	void createTextureBuffer();
