@@ -27,8 +27,7 @@ public:
 	// not copyable
 	WebsocketServer(const WebsocketServer&) = delete;
 	WebsocketServer& operator=(const WebsocketServer&) = delete;
-
-	void bindMessageHandler(std::function<void(MessageType msg)> callback);
+	void bindMessageHandler(std::function<void(MessageType)> callback);
 
 private:
 	void onOpen(Endpoint* endpoint, websocketpp::connection_hdl handle);

@@ -100,7 +100,7 @@ void Texture::updateTextureData(void* data)
 	};
 
 	stagingBuffer.map();
-	stagingBuffer.writeToBuffer(m_stbiData);
+	stagingBuffer.writeToBuffer(data);
 
 	m_device.copyBuffer(
 		stagingBuffer.getBuffer(),
@@ -113,7 +113,7 @@ void Texture::updateTextureData(void* data)
 		VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 	m_device.copyBufferToImage(
-		m_textureBuffer->getBuffer(),
+		stagingBuffer.getBuffer(),
 		m_textureImage,
 		static_cast<uint32_t>(m_width),
 		static_cast<uint32_t>(m_height),
@@ -269,6 +269,16 @@ void Texture::transitionImageLayout(
 
 		srcStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 		dstStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	}
+	else if (
+		oldLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL &&
+		newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+	{
+		barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+		srcStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		dstStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 	}
 	else
 	{

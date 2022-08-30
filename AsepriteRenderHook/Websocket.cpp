@@ -67,7 +67,7 @@ WebsocketServer::~WebsocketServer()
 	m_thread.join();
 }
 
-void WebsocketServer::bindMessageHandler(std::function<void(MessageType msg)> callback)
+void WebsocketServer::bindMessageHandler(std::function<void(MessageType)> callback)
 {
 	m_messageCallback = callback;
 }

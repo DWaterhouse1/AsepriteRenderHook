@@ -81,16 +81,17 @@ target_include_directories( ${PROJECT_NAME}
 		${Vulkan_INCLUDE_DIRS}
    	${GLFW_INCLUDE_DIRS}
     ${GLM_PATH}
-    ${STB_INCLUDE_DIRS}
-)
+    ${STB_INCLUDE_DIRS})
 
 target_link_directories(${PROJECT_NAME}
 	PUBLIC
 		${Vulkan_LIBRARIES}
-    ${GLFW_LIB}
-)
+    ${GLFW_LIB})
 
-target_link_libraries(${PROJECT_NAME} Vulkan::Vulkan glfw3 imgui::imgui)
+target_link_libraries(${PROJECT_NAME}
+  Vulkan::Vulkan
+  glfw3
+  imgui::imgui)
 
 ## build shader files to spir-v
 find_program(GLSL_VALIDATOR glslangValidator HINTS 
@@ -100,15 +101,13 @@ find_program(GLSL_VALIDATOR glslangValidator HINTS
   ${VULKAN_SDK_PATH}/Bin
   ${VULKAN_SDK_PATH}/Bin32
   $ENV{VULKAN_SDK}/Bin/ 
-  $ENV{VULKAN_SDK}/Bin32/
-)
+  $ENV{VULKAN_SDK}/Bin32/)
 
 # get all GLSL files in shaders directory
 file(GLOB_RECURSE GLSL_SOURCE_FILES
   "${PROJECT_SOURCE_DIR}/shaders/*.frag"
   "${PROJECT_SOURCE_DIR}/shaders/*.vert"
-  "${PROJECT_SOURCE_DIR}/shaders/*.comp"
-)
+  "${PROJECT_SOURCE_DIR}/shaders/*.comp")
 
 foreach(GLSL ${GLSL_SOURCE_FILES})
   get_filename_component(FILE_NAME ${GLSL} NAME)
@@ -122,12 +121,10 @@ endforeach(GLSL)
 
 add_custom_target(
     Shaders
-    DEPENDS ${SPIRV_BINARY_FILES}
-)
+    DEPENDS ${SPIRV_BINARY_FILES})
 
 add_custom_target(copyShaders ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/shaders ${PROJECT_BINARY_DIR}/shaders
-    DEPENDS ${SPIRV_BINARY_FILES}
-)
+    DEPENDS ${SPIRV_BINARY_FILES})
 
 add_dependencies(Engine Shaders copyShaders)

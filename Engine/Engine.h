@@ -16,6 +16,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <mutex>
 
 /**
 * Root class for the rendering engine. All rendering related objects are
@@ -38,14 +39,18 @@ public:
 	Engine& operator=(const Engine&) = delete;
 
 	// interface
+	void run();
 	void addTextureDependency(std::string handle, std::string filePath);
 	void addTextureDependency(std::map<std::string, std::string> filePaths);
-	void run();
+	void updateTextureData(std::string textureName, std::vector<uint8_t> data);
 
 private:
 	// initialization functions
 	void loadTextures();
 	void loadEntities();
+
+	// internal functions
+	void executeFunctionList();
 
 	// window params
 	uint32_t m_width = 800;
@@ -63,5 +68,9 @@ private:
 	std::set<std::pair<std::string, std::string>> m_textureDefinitions;
 	std::map<std::string, std::shared_ptr<Texture>> m_textures;
 	std::vector<Entity> m_entities;
+
+	// pre frame execution list
+	std::vector<std::function<void()>> m_functionList;
+	std::mutex m_functionMutex;
 };
 } // namespace wrengine

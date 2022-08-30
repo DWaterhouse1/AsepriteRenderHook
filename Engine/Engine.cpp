@@ -137,6 +137,8 @@ void Engine::run()
 			.count();
 		currentTime = newTime;
 
+		executeFunctionList();
+
 		// -------------  begin frame --------------
 		if (VkCommandBuffer commandBuffer = m_renderer.beginFrame())
 		{
@@ -169,6 +171,28 @@ void Engine::run()
 		}
 	}
 	vkDeviceWaitIdle(m_device.device());
+}
+
+/**
+* Updates the associated texture data held by the texture with the supplied
+* name. Can be called asyncrhonously. Note that this uses C++14 generalized
+* lambda captures.
+* 
+* @param textureName The name of the texture to update.
+* @param data Vector containing the data
+*/
+void Engine::updateTextureData(
+	std::string textureName,
+	std::vector<uint8_t> data)
+{
+	std::function<void()> f_update =
+		[
+			texData = std::move(data),
+			texture = m_textures[textureName]
+		] { texture->updateTextureData((void*)texData.data()); };
+
+	std::scoped_lock<std::mutex> lock(m_functionMutex);
+	m_functionList.push_back(f_update);
 }
 
 /**
@@ -262,5 +286,16 @@ void Engine::loadEntities()
 	triangle.transform2D.scale = { 1.0f, 1.0f };
 	triangle.transform2D.rotation = 0.25f * glm::two_pi<float>();
 	m_entities.push_back(std::move(triangle));
+}
+
+void Engine::executeFunctionList()
+{
+	std::scoped_lock<std::mutex> lock(m_functionMutex);
+	for (auto& function : m_functionList)
+	{
+		function();
+	}
+
+	std::vector<std::function<void()>>().swap(m_functionList);
 }
 } // namespace wrengine
