@@ -27,6 +27,8 @@ void AsepriteRenderHook::initEngine()
 			{"albedo", "Gemstone_Albedo.png"},
 			{"normal", "Gemstone_Normal.png"},
 		});
+
+	m_engine.getUIManager()->pushElement<DemoWindow>();
 }
 
 void AsepriteRenderHook::messageHandler(WebsocketServer::MessageType message)

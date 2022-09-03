@@ -73,7 +73,10 @@ add_library(${PROJECT_NAME}
   Descriptors.cpp
   Texture.h
   Texture.cpp
-  FrameInfo.h)
+  FrameInfo.h
+  InterfaceElement.h
+  ElementManager.h
+  ElementManager.cpp)
 
 target_include_directories( ${PROJECT_NAME}
 	PUBLIC

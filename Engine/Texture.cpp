@@ -76,7 +76,7 @@ VkDescriptorImageInfo Texture::descriptorInfo()
 }
 
 /**
-* Updates the texture object on device memory to use new data. Supports 512x512
+* Updates the texture object on device memory to use new data. Supports 256x256
 * RGBA8888 data only.
 * 
 * @param data Pointer to new texture data.
@@ -84,6 +84,7 @@ VkDescriptorImageInfo Texture::descriptorInfo()
 void Texture::updateTextureData(void* data)
 {
 	// sync by waiting for device
+	// TODO this is likely excessive, prefer to syncronise on a GPU fence.
 	vkDeviceWaitIdle(m_device.device());
 
 	//TODO fix this to write to the image buffer properly, rather than staging

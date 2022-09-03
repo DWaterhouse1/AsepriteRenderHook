@@ -18,8 +18,8 @@
 class WebsocketServer
 {
 public:
-	typedef websocketpp::server<websocketpp::config::asio> Endpoint;
-	typedef websocketpp::config::asio::message_type::ptr MessageType;
+	using MessageType = websocketpp::config::asio::message_type::ptr;
+	using Endpoint = websocketpp::server<websocketpp::config::asio>;
 
 	WebsocketServer(uint16_t port = 30001);
 	~WebsocketServer();

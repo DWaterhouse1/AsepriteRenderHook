@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Websocket.h"
+#include "DemoWindow.h"
 
 // wrengine
 #include "Engine.h"

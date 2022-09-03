@@ -43,6 +43,7 @@ public:
 	void addTextureDependency(std::string handle, std::string filePath);
 	void addTextureDependency(std::map<std::string, std::string> filePaths);
 	void updateTextureData(std::string textureName, std::vector<uint8_t> data);
+	std::shared_ptr<ElementManager> getUIManager();
 
 private:
 	// initialization functions
@@ -50,7 +51,7 @@ private:
 	void loadEntities();
 
 	// internal functions
-	void executeFunctionList();
+	void clearAsyncList();
 
 	// window params
 	uint32_t m_width = 800;
@@ -68,6 +69,7 @@ private:
 	std::set<std::pair<std::string, std::string>> m_textureDefinitions;
 	std::map<std::string, std::shared_ptr<Texture>> m_textures;
 	std::vector<Entity> m_entities;
+	std::unique_ptr<UserInterface> m_userInterface{};
 
 	// pre frame execution list
 	std::vector<std::function<void()>> m_functionList;

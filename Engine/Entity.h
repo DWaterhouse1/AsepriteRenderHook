@@ -37,7 +37,7 @@ public:
 	Entity(const Entity&) = delete;
 	Entity& operator=(const Entity&) = delete;
 
-	// movable
+	// member wise move is sufficient
 	Entity(Entity&&) = default;
 	Entity& operator=(Entity&&) = default;
 

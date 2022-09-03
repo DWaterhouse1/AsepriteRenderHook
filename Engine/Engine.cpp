@@ -33,7 +33,7 @@ Engine::Engine(
 	m_height{ height },
 	m_windowName{ windowName }
 {
-	m_globalDescriptorPool = 
+	m_globalDescriptorPool =
 		DescriptorPool::Builder(m_device)
 		.setMaxSets(Swapchain::MAX_FRAMES_IN_FLIGHT * 2)
 		.addPoolSize(
@@ -43,6 +43,12 @@ Engine::Engine(
 			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 			Swapchain::MAX_FRAMES_IN_FLIGHT)
 		.build();
+
+	m_userInterface = std::make_unique<UserInterface>(
+		m_window,
+		m_device,
+		m_renderer.getSwapchainRenderPass(),
+		static_cast<uint32_t>(m_renderer.getImageCount()));
 }
 
 Engine::~Engine()
@@ -112,13 +118,6 @@ void Engine::run()
 		globalSetLayout->getDescriptorSetLayout()
 	};
 
-	UserInterface userInterface{
-		m_window,
-		m_device,
-		m_renderer.getSwapchainRenderPass(),
-		static_cast<uint32_t>(m_renderer.getImageCount())
-	};
-
 	std::chrono::steady_clock::time_point currentTime =
 		std::chrono::high_resolution_clock::now();
 
@@ -137,7 +136,9 @@ void Engine::run()
 			.count();
 		currentTime = newTime;
 
-		executeFunctionList();
+		clearAsyncList();
+
+		m_userInterface->getElementManager()->tickElements(frameTime);
 
 		// -------------  begin frame --------------
 		if (VkCommandBuffer commandBuffer = m_renderer.beginFrame())
@@ -153,6 +154,11 @@ void Engine::run()
 
 			// FRAME PHASE 1
 			// prepare and update objects in memory
+			//for (auto& element : m_UIStack)
+			//{
+			//	element->tick(frameTime);
+			//}
+
 			GlobalUbo ubo{};
 			ubo.color = glm::vec4(0.0f, 1.0f, 1.0f, 1.0f);
 			uboBuffers[frameIndex]->writeToBuffer(&ubo);
@@ -160,14 +166,14 @@ void Engine::run()
 
 			// FRAME PHASE 2
 			// render the frame
-			userInterface.startFrame();
+			m_userInterface->startFrame();
 			m_renderer.beginSwapchainRenderPass(commandBuffer);
 			renderSystem.renderEntities(frameInfo, m_entities);
-			userInterface.runExample();
-			userInterface.render(commandBuffer);
+			m_userInterface->getElementManager()->runElements();
+			m_userInterface->render(commandBuffer);
 			m_renderer.endSwapchainRenderPass(commandBuffer);
 			m_renderer.endFrame();
-			userInterface.endFrame();
+			m_userInterface->endFrame();
 		}
 	}
 	vkDeviceWaitIdle(m_device.device());
@@ -217,6 +223,11 @@ void Engine::addTextureDependency(std::string handle, std::string filePath)
 void Engine::addTextureDependency(std::map<std::string, std::string> filePaths)
 {
 	m_textureDefinitions.insert(filePaths.begin(), filePaths.end());
+}
+
+std::shared_ptr<ElementManager> Engine::getUIManager()
+{
+	return m_userInterface->getElementManager();
 }
 
 //  Interface end  ----------------------------------
@@ -288,7 +299,7 @@ void Engine::loadEntities()
 	m_entities.push_back(std::move(triangle));
 }
 
-void Engine::executeFunctionList()
+void Engine::clearAsyncList()
 {
 	std::scoped_lock<std::mutex> lock(m_functionMutex);
 	for (auto& function : m_functionList)
