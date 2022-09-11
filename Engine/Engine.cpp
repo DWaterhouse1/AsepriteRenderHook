@@ -25,13 +25,10 @@ struct GlobalUbo
 	glm::vec4 color{ 1.0f, 1.0f, 0.0f, 1.0f};
 };
 
-Engine::Engine(
-	const uint32_t width,
-	const uint32_t height,
-	const std::string& windowName) :
-	m_width{ width },
-	m_height{ height },
-	m_windowName{ windowName }
+Engine::Engine(const EngineConfigInfo configInfo) :
+	m_width{ configInfo.width },
+	m_height{ configInfo.height },
+	m_windowName{ configInfo.windowName }
 {
 	m_globalDescriptorPool =
 		DescriptorPool::Builder(m_device)
@@ -65,7 +62,7 @@ Engine::~Engine()
 */
 void Engine::run()
 {
-	loadTextures();
+	if (!m_texturesLoaded) loadTextures();
 	loadEntities();
 
 	std::vector<std::unique_ptr<Buffer>> uboBuffers(
@@ -115,7 +112,8 @@ void Engine::run()
 	RenderSystem renderSystem{ 
 		m_device,
 		m_renderer.getSwapchainRenderPass(),
-		globalSetLayout->getDescriptorSetLayout()
+		globalSetLayout->getDescriptorSetLayout(),
+		m_scene
 	};
 
 	std::chrono::steady_clock::time_point currentTime =
@@ -230,6 +228,36 @@ std::shared_ptr<ElementManager> Engine::getUIManager()
 	return m_userInterface->getElementManager();
 }
 
+/**
+* Gets the currently active scene object. Will lazy initialize a new scene if
+* no currently active scene exists.
+* 
+* @return Shared ptr to the active scene object.
+*/
+std::shared_ptr<Scene> Engine::getActiveScene()
+{
+	if (!m_scene)
+	{
+		m_scene = std::make_shared<Scene>();
+	}
+
+	return m_scene;
+}
+
+/**
+* Finds a Texture object belonging to the supplied name.
+* 
+* @param name The name of the texture to find.
+* 
+* @return Shared ptr to the texture object with name.
+*/
+std::shared_ptr<Texture> Engine::getTextureByName(const std::string& name)
+{
+	auto texIt = m_textures.find(name);
+	assert(texIt != m_textures.end());
+	return m_textures[name];
+}
+
 //  Interface end  ----------------------------------
 
 /**
@@ -244,6 +272,8 @@ void Engine::loadTextures()
 		m_textures.emplace(handle, std::make_shared<Texture>(m_device));
 		m_textures[handle]->loadFromFile(filePath);
 	}
+
+	m_texturesLoaded = true;
 }
 
 /**
@@ -288,7 +318,7 @@ void Engine::loadEntities()
 	//auto texture = std::make_shared<Texture>(m_device);
 	//texture->loadFromFile("bird.png");
 
-	Entity triangle = Entity::createEntity();
+	EntityDeprecated triangle = EntityDeprecated::createEntity();
 	triangle.model = model;
 	triangle.texture = m_textures["albedo"];
 	//triangle.texture = texture;

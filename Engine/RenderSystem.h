@@ -9,8 +9,9 @@
 #include "Device.h"
 #include "Pipeline.h"
 #include "Model.h"
-#include "Entity.h"
+#include "EntityDeprecated.h"
 #include "FrameInfo.h"
+#include "Scene/Scene.h"
 
 //std
 #include <string>
@@ -29,7 +30,8 @@ public:
 	RenderSystem(
 		Device& device,
 		VkRenderPass renderPass,
-		VkDescriptorSetLayout globalSetLayout);
+		VkDescriptorSetLayout globalSetLayout,
+		std::shared_ptr<Scene> activeScene);
 
 	~RenderSystem();
 
@@ -40,7 +42,7 @@ public:
 	// interface
 	void renderEntities(
 		const FrameInfo& frameInfo,
-		std::vector<Entity>& entities);
+		std::vector<EntityDeprecated>& entities);
 
 private:
 	// helper functions
@@ -51,5 +53,11 @@ private:
 	Device& m_device;
 	std::unique_ptr<Pipeline> m_pipeline;
 	VkPipelineLayout m_pipelineLayout;
+
+	// scene to render
+	std::weak_ptr<Scene> m_activeScene;
+
+	// TODO figure out a better system for drawing quads
+	std::unique_ptr<Model> m_quadModel;
 };
 } // namespace wrengine

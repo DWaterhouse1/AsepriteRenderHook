@@ -12,7 +12,7 @@ namespace wrengine
 * Component structure representing the spatial transform of a 2d object,
 * including translation scale and rotation components.
 */
-struct Transform2DComponent
+struct Transform2DComponentDeprecated
 {
 	glm::vec2 translation{};
 	glm::vec2 scale{ 1.0f, 1.0f };
@@ -25,29 +25,29 @@ struct Transform2DComponent
 * Fundamental renderable class. Entities are created using the static
 * createEntity() function in order to ensure each entity has a unique id_t.
 */
-class Entity
+class EntityDeprecated
 {
 public:
 	using id_t = unsigned int;
 
-	static Entity createEntity();
+	static EntityDeprecated createEntity();
 	id_t getID() const { return m_id; }
 
 	// no duplicate entities
-	Entity(const Entity&) = delete;
-	Entity& operator=(const Entity&) = delete;
+	EntityDeprecated(const EntityDeprecated&) = delete;
+	EntityDeprecated& operator=(const EntityDeprecated&) = delete;
 
 	// member wise move is sufficient
-	Entity(Entity&&) = default;
-	Entity& operator=(Entity&&) = default;
+	EntityDeprecated(EntityDeprecated&&) = default;
+	EntityDeprecated& operator=(EntityDeprecated&&) = default;
 
 	std::shared_ptr<Model> model{};
 	std::shared_ptr<Texture> texture{};
 	glm::vec3 color{};
-	Transform2DComponent transform2D{};
+	Transform2DComponentDeprecated transform2D{};
 
 private:
-	Entity(id_t entityID) : m_id{ entityID } {}
+	EntityDeprecated(id_t entityID) : m_id{ entityID } {}
 
 	id_t m_id;
 };

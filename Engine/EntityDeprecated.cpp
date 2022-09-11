@@ -1,4 +1,4 @@
-#include "Entity.h"
+#include "EntityDeprecated.h"
 
 namespace wrengine
 {
@@ -7,10 +7,10 @@ namespace wrengine
 * 
 * @return The created Entity
 */
-Entity Entity::createEntity()
+EntityDeprecated EntityDeprecated::createEntity()
 {
 	static id_t currentID = 0;
-	return Entity(currentID++);
+	return EntityDeprecated(currentID++);
 }
 
 /**
@@ -18,7 +18,7 @@ Entity Entity::createEntity()
 * 
 * @return The 2x2 matrix transform.
 */
-glm::mat2 Transform2DComponent::mat2()
+glm::mat2 Transform2DComponentDeprecated::mat2()
 {
 	const float s = glm::sin(rotation);
 	const float c = glm::cos(rotation);
@@ -27,4 +27,4 @@ glm::mat2 Transform2DComponent::mat2()
 	glm::mat2 scaleMat{ {scale.x, 0.0f}, {0.0f, scale.y} };
 	return rotMat * scaleMat;
 }
-}
+} // namespace wrengine

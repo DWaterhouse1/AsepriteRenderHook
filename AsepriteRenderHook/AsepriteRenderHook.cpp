@@ -3,13 +3,20 @@
 
 #include "AsepriteRenderHook.h"
 
-AsepriteRenderHook::AsepriteRenderHook() {}
+AsepriteRenderHook::AsepriteRenderHook()
+{
+	wrengine::EngineConfigInfo configInfo{};
+	configInfo.height = HEIGHT;
+	configInfo.width = WIDTH;
+	configInfo.windowName = "Aseprite Render Hook";
+	m_engine = std::make_unique<wrengine::Engine>(configInfo);
+}
 
 void AsepriteRenderHook::run()
 {
 	initServer();
 	initEngine();
-	m_engine.run();
+	m_engine->run();
 }
 
 void AsepriteRenderHook::initServer()
@@ -22,13 +29,19 @@ void AsepriteRenderHook::initServer()
 
 void AsepriteRenderHook::initEngine()
 {
-	m_engine.addTextureDependency(
+	m_engine->addTextureDependency(
 		{
 			{"albedo", "Gemstone_Albedo.png"},
 			{"normal", "Gemstone_Normal.png"},
 		});
+	m_engine->loadTextures();
+	std::shared_ptr<wrengine::Scene> activeScene = m_engine->getActiveScene();
+	wrengine::Entity entity = activeScene->createEntity("main entity");
+	entity.addComponent<wrengine::SpriteRenderComponent>();
+	entity.addComponent<wrengine::Transform2DComponent>();
+	entity.getComponent<wrengine::SpriteRenderComponent>().texture = m_engine->getTextureByName("albedo");
 
-	m_engine.getUIManager()->pushElement<DemoWindow>();
+	m_engine->getUIManager()->pushElement<DemoWindow>();
 }
 
 void AsepriteRenderHook::messageHandler(WebsocketServer::MessageType message)
@@ -53,11 +66,11 @@ void AsepriteRenderHook::messageHandler(WebsocketServer::MessageType message)
 	
 	if (hdr[0] == 'D')
 	{
-		m_engine.updateTextureData("albedo", std::move(payload));
+		m_engine->updateTextureData("albedo", std::move(payload));
 	}
 	else if (hdr[0] == 'N')
 	{
-		m_engine.updateTextureData("normal", std::move(payload));
+		m_engine->updateTextureData("normal", std::move(payload));
 	}
 	std::cout << ss.str();
 

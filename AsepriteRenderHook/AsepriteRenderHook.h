@@ -4,8 +4,7 @@
 #include "DemoWindow.h"
 
 // wrengine
-#include "Engine.h"
-#include "Window.h"
+#include "Wrengine.h"
 
 // std
 #include <iostream>
@@ -34,7 +33,7 @@ private:
 	const uint16_t PORT = 30001;
 	
 	WebsocketServer m_server{ PORT };
-	wrengine::Engine m_engine{ WIDTH, HEIGHT, "Aseprite Render Hook" };
+	std::unique_ptr<wrengine::Engine> m_engine;
 
 	// texture data
 	std::vector<uint8_t> m_diffuseData;

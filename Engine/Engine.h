@@ -5,10 +5,11 @@
 #include "Device.h"
 #include "Renderer.h"
 #include "Model.h"
-#include "Entity.h"
+#include "EntityDeprecated.h"
 #include "Descriptors.h"
 #include "UserInterface.h"
 #include "Texture.h"
+#include "Scene/Scene.h"
 
 //std
 #include <string>
@@ -24,13 +25,17 @@
 */
 namespace wrengine
 {
+struct EngineConfigInfo
+{
+	uint32_t width = 800;
+	uint32_t height = 600;
+	std::string windowName = "wrengine";
+};
+
 class Engine
 {
 public:
-	Engine(
-		const uint32_t width = 800,
-		const uint32_t height = 600,
-		const std::string& windowName = "wrengine");
+	Engine(const EngineConfigInfo configInfo);
 
 	~Engine();
 
@@ -44,10 +49,11 @@ public:
 	void addTextureDependency(std::map<std::string, std::string> filePaths);
 	void updateTextureData(std::string textureName, std::vector<uint8_t> data);
 	std::shared_ptr<ElementManager> getUIManager();
+	void loadTextures();
+	std::shared_ptr<Scene> getActiveScene();
+	std::shared_ptr<Texture> getTextureByName(const std::string& name);
 
 private:
-	// initialization functions
-	void loadTextures();
 	void loadEntities();
 
 	// internal functions
@@ -68,11 +74,17 @@ private:
 	std::unique_ptr<DescriptorPool> m_globalDescriptorPool{};
 	std::set<std::pair<std::string, std::string>> m_textureDefinitions;
 	std::map<std::string, std::shared_ptr<Texture>> m_textures;
-	std::vector<Entity> m_entities;
+	std::vector<EntityDeprecated> m_entities;
 	std::unique_ptr<UserInterface> m_userInterface{};
 
 	// pre frame execution list
 	std::vector<std::function<void()>> m_functionList;
 	std::mutex m_functionMutex;
+
+	// scene containing the ecs registry
+	std::shared_ptr<Scene> m_scene;
+
+	// initialisation flags
+	bool m_texturesLoaded;
 };
 } // namespace wrengine

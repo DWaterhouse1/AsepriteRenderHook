@@ -33,6 +33,9 @@ struct PipelineConfigInfo
 	uint32_t subpass = 0;
 };
 
+/**
+* Encapsulation for vulkan pipeline object.
+*/
 class Pipeline
 {
 public:

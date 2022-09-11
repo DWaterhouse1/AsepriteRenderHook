@@ -19,6 +19,9 @@ find_package(websocketpp CONFIG REQUIRED)
 find_package(boost 1.79.0 REQUIRED system)
 find_package(boost 1.79.0 REQUIRED COMPONENTS asio)
 
+# client requires access to EnTT to correctly utilise the tempalte features
+find_package(EnTT CONFIG REQUIRED)
+
 target_include_directories( ${PROJECT_NAME}
 	PUBLIC
 		${PROJECT_SOURCE_DIR}
@@ -29,6 +32,7 @@ target_link_libraries(${PROJECT_NAME}
 		Engine
 	PRIVATE
 		websocketpp::websocketpp
+		EnTT::EnTT
 )
 
 add_custom_command(

@@ -47,6 +47,9 @@ endif()
 # stb
 find_path(STB_INCLUDE_DIRS "stb_c_lexer.h")
 
+# EnTT
+find_package(EnTT CONFIG REQUIRED)
+
 add_library(${PROJECT_NAME}
   Renderer.cpp
   Pipeline.h
@@ -59,8 +62,8 @@ add_library(${PROJECT_NAME}
   Swapchain.cpp
   Model.h
   Model.cpp
-  Entity.h
-  Entity.cpp
+  "EntityDeprecated.h"
+  "EntityDeprecated.cpp"
   Engine.h 
   Engine.cpp
   RenderSystem.h
@@ -76,7 +79,9 @@ add_library(${PROJECT_NAME}
   FrameInfo.h
   InterfaceElement.h
   ElementManager.h
-  ElementManager.cpp)
+  ElementManager.cpp
+  Scene/Scene.h
+  Scene/Scene.cpp "Scene/Entity.h" "Scene/Entity.cpp" "Scene/Components.h" "Wrengine.h")
 
 target_include_directories( ${PROJECT_NAME}
 	PUBLIC
@@ -94,7 +99,8 @@ target_link_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
   Vulkan::Vulkan
   glfw3
-  imgui::imgui)
+  imgui::imgui
+  EnTT::EnTT)
 
 ## build shader files to spir-v
 find_program(GLSL_VALIDATOR glslangValidator HINTS 

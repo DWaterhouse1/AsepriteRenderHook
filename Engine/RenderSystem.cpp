@@ -27,11 +27,27 @@ namespace wrengine
 RenderSystem::RenderSystem(
 	Device& device,
 	VkRenderPass renderPass,
-	VkDescriptorSetLayout globalSetLayout) :
-	m_device{ device }
+	VkDescriptorSetLayout globalSetLayout,
+	std::shared_ptr<Scene> activeScene) :
+	m_device{ device },
+	m_activeScene{ activeScene }
 {
 	createPipelineLayout(globalSetLayout);
 	createPipeline(renderPass);
+
+	// initialise quad model data 
+	// TODO do this somewhere else
+	Model::VertexData vertexData{};
+	vertexData.vertices =
+	{
+		{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+		{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+		{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+		{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
+	};
+
+	vertexData.indices = { 0, 1, 2, 2, 3, 0 };
+	m_quadModel = std::make_unique<Model>(m_device, vertexData);
 }
 
 RenderSystem::~RenderSystem()
@@ -105,8 +121,16 @@ void RenderSystem::createPipeline(VkRenderPass renderPass)
 */
 void RenderSystem::renderEntities(
 	const FrameInfo& frameInfo,
-	std::vector<Entity>& entities)
+	std::vector<EntityDeprecated>& entities)
 {
+	// TODO handle this more precisely than just throwing an error.
+	// log and return?
+	auto activeSceneLock = m_activeScene.lock();
+	if (!activeSceneLock)
+	{
+		throw std::runtime_error("can't render entities without active scene!");
+	}
+
 	m_pipeline->bind(frameInfo.commandBuffer);
 
 	vkCmdBindDescriptorSets(
@@ -117,29 +141,23 @@ void RenderSystem::renderEntities(
 		&frameInfo.globalDescriptorSet,
 		0, nullptr);
 
-	for (auto& entity : entities)
+	// light moves around slowly
+	static float light{};
+	light += 0.001f;
+	light = std::fmod(light, 360.0f);
+	float s = glm::sin(light);
+	float c = glm::cos(light);
+	float radius = 2.0f;
+	float height = 2.0f;
+	SimplePushConstantData push{};
+	push.lightDir = glm::vec4(radius * s, radius * c, height, 0.0f);
+	
+	auto renderView = activeSceneLock->getAllEntitiesWith<
+		Transform2DComponent,
+		SpriteRenderComponent>();
+
+	for (auto entity : renderView)
 	{
-		//entity.transform2D.rotation = glm::mod(
-		//	entity.transform2D.rotation + 0.001f,
-		//	glm::two_pi<float>());
-
-		static float light{};
-
-		light += 0.001f;
-		light = std::fmod(light, 360.0f);
-		
-		SimplePushConstantData push{};
-		//push.offset = entity.transform2D.translation;
-		//push.color = entity.color;
-		//push.transform = entity.transform2D.mat2();
-
-		float s = glm::sin(light);
-		float c = glm::cos(light);
-		float radius = 2.0f;
-		float height = 2.0f;
-
-		push.lightDir = glm::vec4(radius * s, radius * c, height, 0.0f);
-
 		vkCmdPushConstants(
 			frameInfo.commandBuffer,
 			m_pipelineLayout,
@@ -148,8 +166,43 @@ void RenderSystem::renderEntities(
 			sizeof(SimplePushConstantData),
 			&push);
 
-		entity.model->bind(frameInfo.commandBuffer);
-		entity.model->draw(frameInfo.commandBuffer);
+		m_quadModel->bind(frameInfo.commandBuffer);
+		m_quadModel->draw(frameInfo.commandBuffer);
 	}
+
+	//for (auto& entity : entities)
+	//{
+	//	//entity.transform2D.rotation = glm::mod(
+	//	//	entity.transform2D.rotation + 0.001f,
+	//	//	glm::two_pi<float>());
+
+	//	static float light{};
+
+	//	light += 0.001f;
+	//	light = std::fmod(light, 360.0f);
+	//	
+	//	SimplePushConstantData push{};
+	//	//push.offset = entity.transform2D.translation;
+	//	//push.color = entity.color;
+	//	//push.transform = entity.transform2D.mat2();
+
+	//	float s = glm::sin(light);
+	//	float c = glm::cos(light);
+	//	float radius = 2.0f;
+	//	float height = 2.0f;
+
+	//	push.lightDir = glm::vec4(radius * s, radius * c, height, 0.0f);
+
+	//	vkCmdPushConstants(
+	//		frameInfo.commandBuffer,
+	//		m_pipelineLayout,
+	//		VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+	//		0,
+	//		sizeof(SimplePushConstantData),
+	//		&push);
+
+	//	entity.model->bind(frameInfo.commandBuffer);
+	//	entity.model->draw(frameInfo.commandBuffer);
+	//}
 }
 } // namespace wrengine
