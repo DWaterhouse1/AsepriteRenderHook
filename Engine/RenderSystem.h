@@ -31,6 +31,7 @@ public:
 		Device& device,
 		VkRenderPass renderPass,
 		VkDescriptorSetLayout globalSetLayout,
+		VkDescriptorSetLayout materialSetLayout,
 		std::shared_ptr<Scene> activeScene);
 
 	~RenderSystem();
@@ -46,7 +47,9 @@ public:
 
 private:
 	// helper functions
-	void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
+	void createPipelineLayout(
+		VkDescriptorSetLayout globalSetLayout,
+		VkDescriptorSetLayout materialSetLayout);
 	void createPipeline(VkRenderPass renderPass);
 
 	// vulkan/glfw structures

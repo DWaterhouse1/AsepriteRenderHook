@@ -9,6 +9,17 @@
 
 namespace wrengine
 {
+
+/**
+* Struct containing info relevant to material rendering.
+*/
+struct Material
+{
+	std::shared_ptr<Texture> albedo;
+	std::shared_ptr<Texture> normalMap;
+	VkDescriptorSet materialDescriptor;
+};
+
 /**
 * Component representing a 2D position and rotation.
 */
@@ -41,6 +52,7 @@ struct SpriteRenderComponent
 	glm::vec4 color{ 1.0f, 1.0f, 1.0f, 1.0f };
 	std::shared_ptr<Texture> texture;
 	std::shared_ptr<Texture> normals;
+	Material material;
 
 	SpriteRenderComponent() = default;
 	SpriteRenderComponent(const glm::vec4& color) : color{ color } {}

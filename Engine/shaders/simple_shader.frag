@@ -1,12 +1,13 @@
 #version 450
+#extension GL_KHR_vulkan_glsl: enable
 
 layout(location = 0) in vec3 fragColor;
 layout(location = 1) in vec2 fragTexCoord;
 
 layout(location = 0) out vec4 outColor;
 
-layout(binding = 1) uniform sampler2D texSampler;
-layout(binding = 2) uniform sampler2D normalSampler;
+layout(set = 1, binding = 0) uniform sampler2D texSampler;
+layout(set = 1, binding = 1) uniform sampler2D normalSampler;
 
 layout(push_constant) uniform Push
 {

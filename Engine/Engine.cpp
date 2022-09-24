@@ -20,9 +20,7 @@ namespace wrengine
 {
 struct GlobalUbo
 {
-	//glm::mat2 transform{ 1.0f };
-	//glm::vec4 offset{ 0.0f };
-	glm::vec4 color{ 1.0f, 1.0f, 0.0f, 1.0f};
+	glm::vec3 lightDirection = glm::normalize(glm::vec3{1.0f, -3.0f, 1.0f});
 };
 
 Engine::Engine(const EngineConfigInfo configInfo) :
@@ -63,7 +61,6 @@ Engine::~Engine()
 void Engine::run()
 {
 	if (!m_texturesLoaded) loadTextures();
-	loadEntities();
 
 	std::vector<std::unique_ptr<Buffer>> uboBuffers(
 		Swapchain::MAX_FRAMES_IN_FLIGHT);
@@ -83,14 +80,6 @@ void Engine::run()
 			0,
 			VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 			VK_SHADER_STAGE_VERTEX_BIT)
-		.addBinding(
-			1,
-			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			VK_SHADER_STAGE_FRAGMENT_BIT)
-		.addBinding(
-			2,
-			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-			VK_SHADER_STAGE_FRAGMENT_BIT)
 		.build();
 	
 	std::vector<VkDescriptorSet> globalDescriptorSets(
@@ -99,20 +88,41 @@ void Engine::run()
 	for (int i = 0; i < globalDescriptorSets.size(); ++i)
 	{
 		VkDescriptorBufferInfo bufferInfo = uboBuffers[i]->descriptorInfo();
-		VkDescriptorImageInfo albedoInfo = m_textures["albedo"]->descriptorInfo();
-		VkDescriptorImageInfo normalMapInfo = m_textures["normal"]->descriptorInfo();
 
 		DescriptorWriter(*globalSetLayout, *m_globalDescriptorPool)
 			.writeBuffer(0, &bufferInfo)
-			.writeImage(1, &albedoInfo)
-			.writeImage(2, &normalMapInfo)
 			.build(globalDescriptorSets[i]);
+	}
+
+	auto materialSetLayout = DescriptorSetLayout::Builder(m_device)
+		.addBinding(
+			0,
+			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			VK_SHADER_STAGE_FRAGMENT_BIT)
+		.addBinding(
+			1,
+			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+			VK_SHADER_STAGE_FRAGMENT_BIT)
+		.build();
+
+	auto materialView = m_scene->getAllEntitiesWith<SpriteRenderComponent>();
+	for (auto&& [entity, renderComponent] : materialView.each())
+	{
+		auto& material = renderComponent.material;
+		VkDescriptorImageInfo albedoInfo = material.albedo->descriptorInfo();
+		VkDescriptorImageInfo normalsInfo = material.normalMap->descriptorInfo();
+
+		DescriptorWriter(*materialSetLayout, *m_textureDescriptorPool)
+			.writeImage(0, &albedoInfo)
+			.writeImage(1, &normalsInfo)
+			.build(material.materialDescriptor);
 	}
 
 	RenderSystem renderSystem{ 
 		m_device,
 		m_renderer.getSwapchainRenderPass(),
 		globalSetLayout->getDescriptorSetLayout(),
+		materialSetLayout->getDescriptorSetLayout(),
 		m_scene
 	};
 
@@ -129,9 +139,10 @@ void Engine::run()
 			std::chrono::high_resolution_clock::now();
 		
 		float frameTime = 
-			std::chrono::duration<float, std::chrono::seconds::period>(
-				newTime - currentTime)
-			.count();
+			std::chrono::duration<
+			float,
+			std::chrono::seconds::period>(
+				newTime - currentTime).count();
 		currentTime = newTime;
 
 		clearAsyncList();
@@ -158,7 +169,7 @@ void Engine::run()
 			//}
 
 			GlobalUbo ubo{};
-			ubo.color = glm::vec4(0.0f, 1.0f, 1.0f, 1.0f);
+			//ubo.color = glm::vec4(0.0f, 1.0f, 1.0f, 1.0f);
 			uboBuffers[frameIndex]->writeToBuffer(&ubo);
 			uboBuffers[frameIndex]->flush();
 
@@ -190,10 +201,10 @@ void Engine::updateTextureData(
 	std::vector<uint8_t> data)
 {
 	std::function<void()> f_update =
-		[
-			texData = std::move(data),
-			texture = m_textures[textureName]
-		] { texture->updateTextureData((void*)texData.data()); };
+		[texData = std::move(data), texture = m_textures[textureName]]
+			{
+				texture->updateTextureData((void*)texData.data());
+			};
 
 	std::scoped_lock<std::mutex> lock(m_functionMutex);
 	m_functionList.push_back(f_update);
@@ -254,8 +265,41 @@ std::shared_ptr<Scene> Engine::getActiveScene()
 std::shared_ptr<Texture> Engine::getTextureByName(const std::string& name)
 {
 	auto texIt = m_textures.find(name);
-	assert(texIt != m_textures.end());
+	assert(texIt != m_textures.end() && "failed to find texture!");
 	return m_textures[name];
+}
+
+/**
+* Creates a material from supplied textures.
+* 
+* @param materialName The name of the created material.
+* @param albedoName The name of the texture to use as material albedo.
+* @param normalMapName The name of the texture to use as the materials normal
+*	map.
+*/
+void Engine::createMaterial(
+	const std::string& materialName,
+	const std::string& albedoName,
+	const std::string& normalMapName)
+{
+	Material newMaterial;
+	newMaterial.albedo = getTextureByName(albedoName);
+	newMaterial.normalMap = getTextureByName(normalMapName);
+	m_materials.insert({ materialName, newMaterial });
+}
+
+/**
+* Finds a Material object belonging to the supplied name.
+*
+* @param name The name of the material to find.
+*
+* @return The material object with name.
+*/
+Material Engine::getMaterialByName(const std::string& name)
+{
+	auto texIt = m_materials.find(name);
+	assert(texIt != m_materials.end() && "failed to find material!");
+	return m_materials[name];
 }
 
 //  Interface end  ----------------------------------
@@ -267,13 +311,28 @@ std::shared_ptr<Texture> Engine::getTextureByName(const std::string& name)
 */
 void Engine::loadTextures()
 {
+	m_textureCount = m_textureDefinitions.size();
 	for (auto [handle, filePath] : m_textureDefinitions)
 	{
 		m_textures.emplace(handle, std::make_shared<Texture>(m_device));
 		m_textures[handle]->loadFromFile(filePath);
 	}
 
+	m_textureDescriptorPool = DescriptorPool::Builder(m_device)
+		.setMaxSets(m_textureCount)
+		.addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, m_textureCount)
+		.build();
+
 	m_texturesLoaded = true;
+}
+
+/**
+* Itterates over configured materials and creates the required descriptors for
+* each.
+*/
+void Engine::createMaterialDescriptors()
+{
+	// TODO figure this out
 }
 
 /**

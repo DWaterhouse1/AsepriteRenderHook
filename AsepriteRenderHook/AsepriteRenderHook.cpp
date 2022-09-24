@@ -35,11 +35,14 @@ void AsepriteRenderHook::initEngine()
 			{"normal", "Gemstone_Normal.png"},
 		});
 	m_engine->loadTextures();
+	m_engine->createMaterial("main material", "albedo", "normal");
 	std::shared_ptr<wrengine::Scene> activeScene = m_engine->getActiveScene();
 	wrengine::Entity entity = activeScene->createEntity("main entity");
 	entity.addComponent<wrengine::SpriteRenderComponent>();
 	entity.addComponent<wrengine::Transform2DComponent>();
-	entity.getComponent<wrengine::SpriteRenderComponent>().texture = m_engine->getTextureByName("albedo");
+	
+	entity.getComponent<wrengine::SpriteRenderComponent>().material.albedo = m_engine->getTextureByName("albedo");
+	entity.getComponent<wrengine::SpriteRenderComponent>().material.normalMap = m_engine->getTextureByName("normal");
 
 	m_engine->getUIManager()->pushElement<DemoWindow>();
 }

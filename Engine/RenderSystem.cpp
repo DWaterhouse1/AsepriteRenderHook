@@ -28,11 +28,12 @@ RenderSystem::RenderSystem(
 	Device& device,
 	VkRenderPass renderPass,
 	VkDescriptorSetLayout globalSetLayout,
+	VkDescriptorSetLayout materialSetLayout,
 	std::shared_ptr<Scene> activeScene) :
 	m_device{ device },
 	m_activeScene{ activeScene }
 {
-	createPipelineLayout(globalSetLayout);
+	createPipelineLayout(globalSetLayout, materialSetLayout);
 	createPipeline(renderPass);
 
 	// initialise quad model data 
@@ -61,7 +62,9 @@ RenderSystem::~RenderSystem()
 * 
 * @param globalSetLayout The current global descriptor set layout.
 */
-void RenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout)
+void RenderSystem::createPipelineLayout(
+	VkDescriptorSetLayout globalSetLayout,
+	VkDescriptorSetLayout materialSetLayout)
 {
 	VkPushConstantRange pushConstantRange{};
 	pushConstantRange.stageFlags =
@@ -69,7 +72,10 @@ void RenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout)
 		VK_SHADER_STAGE_FRAGMENT_BIT;
 	pushConstantRange.size = sizeof(SimplePushConstantData);
 
-	std::vector<VkDescriptorSetLayout> descriptorSetLayout{ globalSetLayout };
+	std::vector<VkDescriptorSetLayout> descriptorSetLayout{
+		globalSetLayout,
+		materialSetLayout
+	};
 
 	VkPipelineLayoutCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -123,7 +129,7 @@ void RenderSystem::renderEntities(
 	const FrameInfo& frameInfo,
 	std::vector<EntityDeprecated>& entities)
 {
-	// TODO handle this more precisely than just throwing an error.
+	// TODO handle this more precisely than just throwing an exception.
 	// log and return?
 	auto activeSceneLock = m_activeScene.lock();
 	if (!activeSceneLock)
@@ -156,7 +162,7 @@ void RenderSystem::renderEntities(
 		Transform2DComponent,
 		SpriteRenderComponent>();
 
-	for (auto entity : renderView)
+	for (auto&& [entity, transformComponent, renderComponent] : renderView.each())
 	{
 		vkCmdPushConstants(
 			frameInfo.commandBuffer,
@@ -165,6 +171,14 @@ void RenderSystem::renderEntities(
 			0,
 			sizeof(SimplePushConstantData),
 			&push);
+
+		vkCmdBindDescriptorSets(
+			frameInfo.commandBuffer,
+			VK_PIPELINE_BIND_POINT_GRAPHICS,
+			m_pipelineLayout,
+			1, 1,
+			&renderComponent.material.materialDescriptor,
+			0, nullptr);
 
 		m_quadModel->bind(frameInfo.commandBuffer);
 		m_quadModel->draw(frameInfo.commandBuffer);

@@ -54,8 +54,7 @@ public:
 
 	DescriptorSetLayout(
 		Device& device,
-		BindingMap bindings
-	);
+		BindingMap bindings);
 	~DescriptorSetLayout();
 
 	// not copyable

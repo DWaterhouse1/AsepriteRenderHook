@@ -9,7 +9,9 @@
 #include "Descriptors.h"
 #include "UserInterface.h"
 #include "Texture.h"
+
 #include "Scene/Scene.h"
+#include "Scene/Components.h"
 
 //std
 #include <string>
@@ -19,12 +21,12 @@
 #include <map>
 #include <mutex>
 
-/**
-* Root class for the rendering engine. All rendering related objects are
-* instantiated by Engine. Constructor sets initial window parameters.
-*/
+
 namespace wrengine
 {
+/**
+* Struct for engine initialisation info.
+*/
 struct EngineConfigInfo
 {
 	uint32_t width = 800;
@@ -32,6 +34,10 @@ struct EngineConfigInfo
 	std::string windowName = "wrengine";
 };
 
+/**
+* Root class for the rendering engine. All rendering related objects are
+* instantiated by Engine. Constructor sets initial window parameters.
+*/
 class Engine
 {
 public:
@@ -52,12 +58,18 @@ public:
 	void loadTextures();
 	std::shared_ptr<Scene> getActiveScene();
 	std::shared_ptr<Texture> getTextureByName(const std::string& name);
+	void createMaterial(
+		const std::string& materialName,
+		const std::string& albedoName,
+		const std::string& normalMapName);
+	Material getMaterialByName(const std::string& name);
 
 private:
 	void loadEntities();
 
 	// internal functions
 	void clearAsyncList();
+	void createMaterialDescriptors();
 
 	// window params
 	uint32_t m_width = 800;
@@ -70,10 +82,13 @@ private:
 	Renderer m_renderer{ m_window, m_device };
 	VkPipelineLayout m_pipelineLayout;
 
-	// note that the pool depends on the device, and must be cleaned up first
-	std::unique_ptr<DescriptorPool> m_globalDescriptorPool{};
+	// note that the pools depend on the device, and must be cleaned up first
+	std::unique_ptr<DescriptorPool> m_globalDescriptorPool;
+	std::unique_ptr<DescriptorPool> m_textureDescriptorPool;
 	std::set<std::pair<std::string, std::string>> m_textureDefinitions;
 	std::map<std::string, std::shared_ptr<Texture>> m_textures;
+	std::map<std::string, Material> m_materials;
+	size_t m_textureCount = 0;
 	std::vector<EntityDeprecated> m_entities;
 	std::unique_ptr<UserInterface> m_userInterface{};
 
