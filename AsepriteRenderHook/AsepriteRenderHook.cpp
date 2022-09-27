@@ -40,6 +40,7 @@ void AsepriteRenderHook::initEngine()
 	wrengine::Entity entity = activeScene->createEntity("main entity");
 	entity.addComponent<wrengine::SpriteRenderComponent>();
 	entity.addComponent<wrengine::Transform2DComponent>();
+	entity.addComponent<wrengine::ScriptComponent>().bind<MyScript>();
 	
 	entity.getComponent<wrengine::SpriteRenderComponent>().material.albedo = m_engine->getTextureByName("albedo");
 	entity.getComponent<wrengine::SpriteRenderComponent>().material.normalMap = m_engine->getTextureByName("normal");

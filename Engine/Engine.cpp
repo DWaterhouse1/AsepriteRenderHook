@@ -126,6 +126,8 @@ void Engine::run()
 		m_scene
 	};
 
+	m_scene->onSceneStart();
+
 	std::chrono::steady_clock::time_point currentTime =
 		std::chrono::high_resolution_clock::now();
 
@@ -163,10 +165,7 @@ void Engine::run()
 
 			// FRAME PHASE 1
 			// prepare and update objects in memory
-			//for (auto& element : m_UIStack)
-			//{
-			//	element->tick(frameTime);
-			//}
+			m_scene->onUpdate(frameTime);
 
 			GlobalUbo ubo{};
 			//ubo.color = glm::vec4(0.0f, 1.0f, 1.0f, 1.0f);

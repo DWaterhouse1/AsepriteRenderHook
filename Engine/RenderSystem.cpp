@@ -17,8 +17,9 @@
 struct SimplePushConstantData
 {
 	glm::vec4 lightDir{};
-	//glm::mat2 transform{ 1.0f };
-	//glm::vec2 offset;
+	glm::mat2 transform{ 1.0f };
+	glm::vec2 offset { 0.0f };
+	uint8_t padding;
 	//alignas(16) glm::vec3 color;
 };
 
@@ -155,8 +156,10 @@ void RenderSystem::renderEntities(
 	float c = glm::cos(light);
 	float radius = 2.0f;
 	float height = 2.0f;
-	SimplePushConstantData push{};
-	push.lightDir = glm::vec4(radius * s, radius * c, height, 0.0f);
+
+	static float rotation{};
+	rotation += 0.0001f;
+	rotation = std::fmod(rotation, 360.0f);
 	
 	auto renderView = activeSceneLock->getAllEntitiesWith<
 		Transform2DComponent,
@@ -164,6 +167,17 @@ void RenderSystem::renderEntities(
 
 	for (auto&& [entity, transformComponent, renderComponent] : renderView.each())
 	{
+		SimplePushConstantData push{};
+
+		push.offset = transformComponent.position;
+
+		float rotSin = glm::sin(rotation);
+		float rotCos = glm::cos(rotation);
+
+		push.transform = glm::mat2(rotCos, -rotSin, rotSin, rotCos);
+
+		push.lightDir = glm::vec4(radius * s, radius * c, height, 0.0f);
+
 		vkCmdPushConstants(
 			frameInfo.commandBuffer,
 			m_pipelineLayout,

@@ -27,6 +27,9 @@ public:
 		return m_registry.view<Components...>();
 	}
 
+	void onSceneStart();
+	void onUpdate(float deltaTime);
+
 private:
 	entt::registry m_registry;
 

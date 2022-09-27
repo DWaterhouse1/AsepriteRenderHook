@@ -81,7 +81,7 @@ add_library(${PROJECT_NAME}
   ElementManager.h
   ElementManager.cpp
   Scene/Scene.h
-  Scene/Scene.cpp "Scene/Entity.h" "Scene/Entity.cpp" "Scene/Components.h" "Wrengine.h")
+  Scene/Scene.cpp "Scene/Entity.h" "Scene/Entity.cpp" "Scene/Components.h" "Wrengine.h"  "Scene/ScriptableEntity.h")
 
 target_include_directories( ${PROJECT_NAME}
 	PUBLIC

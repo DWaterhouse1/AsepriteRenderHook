@@ -11,6 +11,20 @@
 #include <memory>
 #include <vector>
 
+class MyScript : public wrengine::ScriptableEntity
+{
+public:
+	void onCreate() override
+	{
+		getComponent<wrengine::Transform2DComponent>();
+	}
+
+	void onUpdate(float deltaTime) override
+	{
+		std::cout << "Timestep: " << deltaTime << "ms\n";
+	}
+};
+
 class AsepriteRenderHook
 {
 

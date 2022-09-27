@@ -12,8 +12,8 @@ layout(set = 1, binding = 1) uniform sampler2D normalSampler;
 layout(push_constant) uniform Push
 {
 	vec4 lightDir;
-	//mat2 transform;
-	//vec2 offset;
+	mat2 transform;
+	vec2 offset;
 	//vec3 color;
 } push;
 

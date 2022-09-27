@@ -6,6 +6,8 @@
 
 //std
 #include <string>
+#include <functional>
+#include <memory>
 
 namespace wrengine
 {
@@ -56,5 +58,26 @@ struct SpriteRenderComponent
 
 	SpriteRenderComponent() = default;
 	SpriteRenderComponent(const glm::vec4& color) : color{ color } {}
+};
+
+// forward declaration
+class ScriptableEntity;
+
+/**
+* Component containing custom script instance
+*/
+struct ScriptComponent
+{
+	std::unique_ptr<ScriptableEntity> instance = nullptr;
+
+	std::function<void()> instantiate;
+	std::function<void()> destroy;
+
+	template<typename T>
+	void bind()
+	{
+		instantiate = [&]() { instance = std::make_unique<T>(); };
+		destroy	=	[&]() { instance.reset(); };
+	}
 };
 } // namespace wrengine
