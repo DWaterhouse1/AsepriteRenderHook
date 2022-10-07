@@ -3,6 +3,8 @@
 
 #include "AsepriteRenderHook.h"
 
+#include "PointLightController.h"
+
 AsepriteRenderHook::AsepriteRenderHook()
 {
 	wrengine::EngineConfigInfo configInfo{};
@@ -37,13 +39,18 @@ void AsepriteRenderHook::initEngine()
 	m_engine->loadTextures();
 	m_engine->createMaterial("main material", "albedo", "normal");
 	std::shared_ptr<wrengine::Scene> activeScene = m_engine->getActiveScene();
-	wrengine::Entity entity = activeScene->createEntity("main entity");
-	entity.addComponent<wrengine::SpriteRenderComponent>();
-	entity.addComponent<wrengine::Transform2DComponent>();
-	entity.addComponent<wrengine::ScriptComponent>().bind<MyScript>();
+	wrengine::Entity gemEntity = activeScene->createEntity("main entity");
+	gemEntity.addComponent<wrengine::SpriteRenderComponent>();
+	gemEntity.addComponent<wrengine::Transform2DComponent>();
+	gemEntity.addComponent<wrengine::ScriptComponent>().bind<MovingSprite>();
 	
-	entity.getComponent<wrengine::SpriteRenderComponent>().material.albedo = m_engine->getTextureByName("albedo");
-	entity.getComponent<wrengine::SpriteRenderComponent>().material.normalMap = m_engine->getTextureByName("normal");
+	gemEntity.getComponent<wrengine::SpriteRenderComponent>().material.albedo = m_engine->getTextureByName("albedo");
+	gemEntity.getComponent<wrengine::SpriteRenderComponent>().material.normalMap = m_engine->getTextureByName("normal");
+
+	wrengine::Entity lightEntity = activeScene->createEntity("light entity");
+	lightEntity.addComponent<wrengine::PointLightComponent>();
+	lightEntity.addComponent<wrengine::Transform2DComponent>();
+	lightEntity.addComponent<wrengine::ScriptComponent>().bind<PointLightController>();
 
 	m_engine->getUIManager()->pushElement<DemoWindow>();
 }

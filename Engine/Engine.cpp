@@ -5,7 +5,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
+// systems
 #include "RenderSystem.h"
+#include "PointLightSystem.h"
 
 #include <imgui.h>
 
@@ -18,11 +20,6 @@
 
 namespace wrengine
 {
-struct GlobalUbo
-{
-	glm::vec3 lightDirection = glm::normalize(glm::vec3{1.0f, -3.0f, 1.0f});
-};
-
 Engine::Engine(const EngineConfigInfo configInfo) :
 	m_width{ configInfo.width },
 	m_height{ configInfo.height },
@@ -79,7 +76,7 @@ void Engine::run()
 		.addBinding(
 			0,
 			VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			VK_SHADER_STAGE_VERTEX_BIT)
+			VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
 		.build();
 	
 	std::vector<VkDescriptorSet> globalDescriptorSets(
@@ -108,7 +105,7 @@ void Engine::run()
 	auto materialView = m_scene->getAllEntitiesWith<SpriteRenderComponent>();
 	for (auto&& [entity, renderComponent] : materialView.each())
 	{
-		auto& material = renderComponent.material;
+		Material& material = renderComponent.material;
 		VkDescriptorImageInfo albedoInfo = material.albedo->descriptorInfo();
 		VkDescriptorImageInfo normalsInfo = material.normalMap->descriptorInfo();
 
@@ -125,6 +122,8 @@ void Engine::run()
 		materialSetLayout->getDescriptorSetLayout(),
 		m_scene
 	};
+
+	PointLightSystem pointLightSystem{ m_scene };
 
 	m_scene->onSceneStart();
 
@@ -168,7 +167,7 @@ void Engine::run()
 			m_scene->onUpdate(frameTime);
 
 			GlobalUbo ubo{};
-			//ubo.color = glm::vec4(0.0f, 1.0f, 1.0f, 1.0f);
+			pointLightSystem.update(ubo);
 			uboBuffers[frameIndex]->writeToBuffer(&ubo);
 			uboBuffers[frameIndex]->flush();
 

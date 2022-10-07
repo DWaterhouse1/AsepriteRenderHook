@@ -51,7 +51,7 @@ struct TagComponent
 */
 struct SpriteRenderComponent
 {
-	glm::vec4 color{ 1.0f, 1.0f, 1.0f, 1.0f };
+	glm::vec4 color{ 1.0f };
 	std::shared_ptr<Texture> texture;
 	std::shared_ptr<Texture> normals;
 	Material material;
@@ -79,5 +79,10 @@ struct ScriptComponent
 		instantiate = [&]() { instance = std::make_unique<T>(); };
 		destroy	=	[&]() { instance.reset(); };
 	}
+};
+
+struct PointLightComponent
+{
+	glm::vec4 lightColor{ 1.0f };
 };
 } // namespace wrengine

@@ -8,7 +8,7 @@ add_executable (
 	AsepriteRenderHook.h
 	Websocket.h
 	Websocket.cpp
-	main.cpp "DemoWindow.h" "DemoWindow.cpp")
+	main.cpp "DemoWindow.h" "DemoWindow.cpp" "PointLightController.h" "PointLightController.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET AsepriteRenderHook PROPERTY CXX_STANDARD 20)

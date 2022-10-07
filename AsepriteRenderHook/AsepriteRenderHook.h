@@ -11,18 +11,25 @@
 #include <memory>
 #include <vector>
 
-class MyScript : public wrengine::ScriptableEntity
+class MovingSprite : public wrengine::ScriptableEntity
 {
 public:
 	void onCreate() override
 	{
-		getComponent<wrengine::Transform2DComponent>();
+		m_transformComponent = &getComponent<wrengine::Transform2DComponent>();
 	}
 
 	void onUpdate(float deltaTime) override
 	{
-		std::cout << "Timestep: " << deltaTime << "ms\n";
+		spriteAngle += (0.5f * deltaTime);
+		spriteAngle = std::fmod(spriteAngle, 360.0f);
+		m_transformComponent->position.x = std::sin(spriteAngle);
 	}
+
+private:
+	wrengine::Transform2DComponent* m_transformComponent;
+
+	float spriteAngle = 0.0f;
 };
 
 class AsepriteRenderHook
