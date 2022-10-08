@@ -27,10 +27,11 @@ std::vector<VkVertexInputBindingDescription> Model::Vertex::getBindingDescriptio
 */
 std::vector<VkVertexInputAttributeDescription> Model::Vertex::getAttributeDescriptions()
 {
+	// TODO mode switching 2d/3d for vec2/vec3 position attributes
 	std::vector<VkVertexInputAttributeDescription> attributeDescriptions(3);
 	attributeDescriptions[0].binding = 0;
 	attributeDescriptions[0].location = 0;
-	attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+	attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
 	attributeDescriptions[0].offset = offsetof(Vertex, position);
 
 	attributeDescriptions[1].binding = 0;

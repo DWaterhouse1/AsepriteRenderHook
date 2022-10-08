@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Texture.h"
+#include "Camera.h"
 
 #include <glm/glm.hpp>
 
@@ -25,14 +26,17 @@ struct Material
 /**
 * Component representing a 2D position and rotation.
 */
-struct Transform2DComponent
+struct TransformComponent
 {
-	glm::vec2 position{ 0.0f, 0.0f };
-	glm::vec2 scale{ 1.0f, 1.0f };
-	float rotation = 0.0f;
-	Transform2DComponent() = default;
-	Transform2DComponent(glm::vec2 position, float rotation) :
-		position{ position }, rotation{ rotation } {}
+	glm::vec3 translation{ 0.0f };
+	glm::vec3 scale{ 1.0f };
+	glm::vec3 rotation{ 0.0f };
+	TransformComponent() = default;
+	TransformComponent(glm::vec3 translation, glm::vec3 scale, glm::vec3 rotation) :
+		translation{ translation },
+		scale{ scale },
+		rotation{ rotation }
+	{}
 };
 
 /**
@@ -84,5 +88,13 @@ struct ScriptComponent
 struct PointLightComponent
 {
 	glm::vec4 lightColor{ 1.0f };
+};
+
+struct CameraComponent
+{
+	CameraComponent() = default;
+	CameraComponent(const glm::mat4& projection) : camera{ projection } {}
+
+	Camera camera;
 };
 } // namespace wrengine

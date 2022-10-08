@@ -4,6 +4,7 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 // std
 #include <stdexcept>
@@ -14,11 +15,9 @@
 /**
 * Simple struct for push constants. Contains transform, offset and color data.
 */
-struct SimplePushConstantData
+struct PushConstantData
 {
-	glm::mat2 transform{ 1.0f };
-	glm::vec2 offset { 0.0f };
-	uint8_t padding;
+	glm::mat4 transform{ 1.0f };
 };
 
 namespace wrengine
@@ -40,10 +39,10 @@ RenderSystem::RenderSystem(
 	Model::VertexData vertexData{};
 	vertexData.vertices =
 	{
-		{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-		{{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-		{{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-		{{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
+		{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+		{{ 0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+		{{ 0.5f,  0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+		{{-0.5f,  0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
 	};
 
 	vertexData.indices = { 0, 1, 2, 2, 3, 0 };
@@ -69,7 +68,7 @@ void RenderSystem::createPipelineLayout(
 	pushConstantRange.stageFlags =
 		VK_SHADER_STAGE_VERTEX_BIT |
 		VK_SHADER_STAGE_FRAGMENT_BIT;
-	pushConstantRange.size = sizeof(SimplePushConstantData);
+	pushConstantRange.size = sizeof(PushConstantData);
 
 	std::vector<VkDescriptorSetLayout> descriptorSetLayout{
 		globalSetLayout,
@@ -147,26 +146,27 @@ void RenderSystem::renderEntities(
 		0, nullptr);
 	
 	auto renderView = activeSceneLock->getAllEntitiesWith<
-		Transform2DComponent,
+		TransformComponent,
 		SpriteRenderComponent>();
 
-	for (auto&& [entity, transformComponent, renderComponent] : renderView.each())
+	for (auto&& [entity, transform, render] : renderView.each())
 	{
-		SimplePushConstantData push{};
+		PushConstantData push{};
 
-		push.offset = transformComponent.position;
+		glm::mat4 transformMat = glm::translate(glm::mat4{ 1.0f }, transform.translation);
+		transformMat = glm::scale(transformMat, transform.scale);
+		transformMat = glm::rotate(transformMat, transform.rotation.y, glm::vec3{ 0.0f, 1.0f, 0.0f });
+		transformMat = glm::rotate(transformMat, transform.rotation.x, glm::vec3{ 1.0f, 0.0f, 0.0f });
+		transformMat = glm::rotate(transformMat, transform.rotation.z, glm::vec3{ 0.0f, 0.0f, 1.0f });
 
-		float rotation = transformComponent.rotation;
-		float rotSin = glm::sin(rotation);
-		float rotCos = glm::cos(rotation);
-		push.transform = glm::mat2(rotCos, -rotSin, rotSin, rotCos);
+		push.transform = transformMat;
 
 		vkCmdPushConstants(
 			frameInfo.commandBuffer,
 			m_pipelineLayout,
 			VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 			0,
-			sizeof(SimplePushConstantData),
+			sizeof(PushConstantData),
 			&push);
 
 		vkCmdBindDescriptorSets(
@@ -174,7 +174,7 @@ void RenderSystem::renderEntities(
 			VK_PIPELINE_BIND_POINT_GRAPHICS,
 			m_pipelineLayout,
 			1, 1,
-			&renderComponent.material.materialDescriptor,
+			&render.material.materialDescriptor,
 			0, nullptr);
 
 		m_quadModel->bind(frameInfo.commandBuffer);

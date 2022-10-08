@@ -42,10 +42,10 @@ private:
 
 	Device& m_device;
 	std::unique_ptr<Buffer> m_textureBuffer;
-	VkImage m_textureImage;
-	VkDeviceMemory m_textureImageMemory;
-	VkImageView m_textureImageView{};
-	VkSampler m_textureSampler;
+	VkImage m_textureImage = nullptr;
+	VkDeviceMemory m_textureImageMemory = nullptr;
+	VkImageView m_textureImageView = nullptr;
+	VkSampler m_textureSampler = nullptr;
 	
 	// stbi
 	void* m_stbiData = nullptr;

@@ -62,8 +62,8 @@ add_library(${PROJECT_NAME}
   Swapchain.cpp
   Model.h
   Model.cpp
-  "EntityDeprecated.h"
-  "EntityDeprecated.cpp"
+  EntityDeprecated.h
+  EntityDeprecated.cpp
   Engine.h 
   Engine.cpp
   RenderSystem.h
@@ -88,7 +88,9 @@ add_library(${PROJECT_NAME}
   Wrengine.h 
   Scene/ScriptableEntity.h
   PointLightSystem.h
-  PointLightSystem.cpp)
+  PointLightSystem.cpp
+  Camera.h
+  Camera.cpp)
 
 target_include_directories( ${PROJECT_NAME}
 	PUBLIC

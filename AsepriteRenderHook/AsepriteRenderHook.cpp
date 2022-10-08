@@ -5,6 +5,9 @@
 
 #include "PointLightController.h"
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+
 AsepriteRenderHook::AsepriteRenderHook()
 {
 	wrengine::EngineConfigInfo configInfo{};
@@ -39,18 +42,25 @@ void AsepriteRenderHook::initEngine()
 	m_engine->loadTextures();
 	m_engine->createMaterial("main material", "albedo", "normal");
 	std::shared_ptr<wrengine::Scene> activeScene = m_engine->getActiveScene();
-	wrengine::Entity gemEntity = activeScene->createEntity("main entity");
+
+	// the sprite
+	wrengine::Entity gemEntity = activeScene->createEntity("main");
 	gemEntity.addComponent<wrengine::SpriteRenderComponent>();
-	gemEntity.addComponent<wrengine::Transform2DComponent>();
+	gemEntity.addComponent<wrengine::TransformComponent>();
 	gemEntity.addComponent<wrengine::ScriptComponent>().bind<MovingSprite>();
-	
 	gemEntity.getComponent<wrengine::SpriteRenderComponent>().material.albedo = m_engine->getTextureByName("albedo");
 	gemEntity.getComponent<wrengine::SpriteRenderComponent>().material.normalMap = m_engine->getTextureByName("normal");
 
-	wrengine::Entity lightEntity = activeScene->createEntity("light entity");
+	// point light
+	wrengine::Entity lightEntity = activeScene->createEntity("light");
 	lightEntity.addComponent<wrengine::PointLightComponent>();
-	lightEntity.addComponent<wrengine::Transform2DComponent>();
+	lightEntity.addComponent<wrengine::TransformComponent>();
 	lightEntity.addComponent<wrengine::ScriptComponent>().bind<PointLightController>();
+
+	// the camera
+	wrengine::Entity cameraEntity = activeScene->createEntity("camera");
+	cameraEntity.addComponent<wrengine::TransformComponent>();
+	cameraEntity.addComponent<wrengine::CameraComponent>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f));
 
 	m_engine->getUIManager()->pushElement<DemoWindow>();
 }

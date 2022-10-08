@@ -40,6 +40,11 @@ void Scene::onSceneStart()
 
 void Scene::onUpdate(float deltaTime)
 {
+	auto group = m_registry.group<CameraComponent>(entt::get<TransformComponent>);
+	for (auto& [entity, camera, transform] : group.each())
+	{
+
+	}
 
 	// update scripts
 	for (auto& [entity, script] : m_registry.view<ScriptComponent>().each())

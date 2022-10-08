@@ -16,18 +16,20 @@ class MovingSprite : public wrengine::ScriptableEntity
 public:
 	void onCreate() override
 	{
-		m_transformComponent = &getComponent<wrengine::Transform2DComponent>();
+		m_transformComponent = &getComponent<wrengine::TransformComponent>();
+		m_transformComponent->translation = { 0.0f, 0.0f, 0.5f };
+		m_transformComponent->scale = { 0.5f, 0.5f, 0.5f };
 	}
 
 	void onUpdate(float deltaTime) override
 	{
-		spriteAngle += (0.5f * deltaTime);
-		spriteAngle = std::fmod(spriteAngle, 360.0f);
-		m_transformComponent->position.x = std::sin(spriteAngle);
+		//spriteAngle += (0.5f * deltaTime);
+		//spriteAngle = std::fmod(spriteAngle, 360.0f);
+		//m_transformComponent->position.x = std::sin(spriteAngle);
 	}
 
 private:
-	wrengine::Transform2DComponent* m_transformComponent;
+	wrengine::TransformComponent* m_transformComponent;
 
 	float spriteAngle = 0.0f;
 };

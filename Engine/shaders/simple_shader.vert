@@ -2,7 +2,7 @@
 #extension GL_KHR_vulkan_glsl: enable
 #extension GL_EXT_debug_printf: enable
 
-layout(location = 0) in vec2 position;
+layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 color;
 layout(location = 2) in vec2 uv;
 
@@ -24,13 +24,13 @@ layout(set = 0, binding = 0) uniform GlobalUbo
 
 layout(push_constant) uniform Push
 {
-	mat2 transform;
-	vec2 offset;
+	mat4 transform;
 } push;
 
 void main()
 {
-	gl_Position = vec4((push.transform * position) + push.offset, 0.0, 1.0);
-	fragPos = vec3(position + push.offset, 0);
+	vec4 position = push.transform * vec4(position, 1.0);
+	gl_Position = position;
+	fragPos = position.xyz;
 	fragTexCoord = uv;
 }
