@@ -18,18 +18,18 @@ public:
 	{
 		m_transformComponent = &getComponent<wrengine::TransformComponent>();
 		m_transformComponent->translation = { 0.0f, 0.0f, 0.5f };
-		m_transformComponent->scale = { 0.5f, 0.5f, 0.5f };
+		m_transformComponent->scale = { 1.5f, 1.5f, 1.5f };
 	}
 
 	void onUpdate(float deltaTime) override
 	{
-		//spriteAngle += (0.5f * deltaTime);
-		//spriteAngle = std::fmod(spriteAngle, 360.0f);
-		//m_transformComponent->position.x = std::sin(spriteAngle);
+		spriteAngle += (0.5f * deltaTime);
+		spriteAngle = std::fmod(spriteAngle, 360.0f);
+		m_transformComponent->translation.x = std::sin(spriteAngle);
 	}
 
 private:
-	wrengine::TransformComponent* m_transformComponent;
+	wrengine::TransformComponent* m_transformComponent = nullptr;
 
 	float spriteAngle = 0.0f;
 };

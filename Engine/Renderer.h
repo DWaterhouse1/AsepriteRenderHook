@@ -36,6 +36,7 @@ public:
 	bool isFrameInProgress() const { return m_isFrameStarted; }
 	VkCommandBuffer getCurrentCommandBuffer() const;
 	VkRenderPass getSwapchainRenderPass() const;
+	float getAspectRatio() const { return m_swapchain->extentAspectRatio(); }
 	void waitIdle();
 	int getFrameIndex() const;
 	size_t getImageCount() { return m_swapchain->imageCount(); }

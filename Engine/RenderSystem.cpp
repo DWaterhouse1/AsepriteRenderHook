@@ -149,6 +149,9 @@ void RenderSystem::renderEntities(
 		TransformComponent,
 		SpriteRenderComponent>();
 
+	std::shared_ptr<Camera> camera = activeSceneLock->getActiveCamera();
+	glm::mat4 projectionView = camera->getProjection() * camera->getView();
+
 	for (auto&& [entity, transform, render] : renderView.each())
 	{
 		PushConstantData push{};
@@ -159,7 +162,7 @@ void RenderSystem::renderEntities(
 		transformMat = glm::rotate(transformMat, transform.rotation.x, glm::vec3{ 1.0f, 0.0f, 0.0f });
 		transformMat = glm::rotate(transformMat, transform.rotation.z, glm::vec3{ 0.0f, 0.0f, 1.0f });
 
-		push.transform = transformMat;
+		push.transform = projectionView * transformMat;
 
 		vkCmdPushConstants(
 			frameInfo.commandBuffer,
@@ -180,40 +183,5 @@ void RenderSystem::renderEntities(
 		m_quadModel->bind(frameInfo.commandBuffer);
 		m_quadModel->draw(frameInfo.commandBuffer);
 	}
-
-	//for (auto& entity : entities)
-	//{
-	//	//entity.transform2D.rotation = glm::mod(
-	//	//	entity.transform2D.rotation + 0.001f,
-	//	//	glm::two_pi<float>());
-
-	//	static float light{};
-
-	//	light += 0.001f;
-	//	light = std::fmod(light, 360.0f);
-	//	
-	//	SimplePushConstantData push{};
-	//	//push.offset = entity.transform2D.translation;
-	//	//push.color = entity.color;
-	//	//push.transform = entity.transform2D.mat2();
-
-	//	float s = glm::sin(light);
-	//	float c = glm::cos(light);
-	//	float radius = 2.0f;
-	//	float height = 2.0f;
-
-	//	push.lightDir = glm::vec4(radius * s, radius * c, height, 0.0f);
-
-	//	vkCmdPushConstants(
-	//		frameInfo.commandBuffer,
-	//		m_pipelineLayout,
-	//		VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-	//		0,
-	//		sizeof(SimplePushConstantData),
-	//		&push);
-
-	//	entity.model->bind(frameInfo.commandBuffer);
-	//	entity.model->draw(frameInfo.commandBuffer);
-	//}
 }
 } // namespace wrengine

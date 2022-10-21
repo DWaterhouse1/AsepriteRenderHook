@@ -60,7 +60,14 @@ void AsepriteRenderHook::initEngine()
 	// the camera
 	wrengine::Entity cameraEntity = activeScene->createEntity("camera");
 	cameraEntity.addComponent<wrengine::TransformComponent>();
-	cameraEntity.addComponent<wrengine::CameraComponent>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f));
+	cameraEntity.addComponent<wrengine::CameraComponent>(glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f));
+
+	/*TODO add proper constraints on setting the active camera. Direct access as here
+	* can lead easily to invalid state.
+	*/
+	cameraEntity.getComponent<wrengine::CameraComponent>().isActiveCamera = true;
+	cameraEntity.getComponent<wrengine::TransformComponent>().translation = glm::vec3( 0.0f );
+	cameraEntity.getComponent<wrengine::TransformComponent>().rotation = glm::vec3(0.0f, 0.0f, 1.0f);
 
 	m_engine->getUIManager()->pushElement<DemoWindow>();
 }

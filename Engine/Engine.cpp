@@ -165,6 +165,11 @@ void Engine::run()
 			// FRAME PHASE 1
 			// prepare and update objects in memory
 			m_scene->onUpdate(frameTime);
+			float aspect = m_renderer.getAspectRatio();
+			m_scene->getActiveCamera()->setOrthographicProjection(
+				-aspect, aspect,
+				-1, 1,
+				-1, 1);
 
 			GlobalUbo ubo{};
 			pointLightSystem.update(ubo);
@@ -310,7 +315,7 @@ Material Engine::getMaterialByName(const std::string& name)
 void Engine::loadTextures()
 {
 	m_textureCount = m_textureDefinitions.size();
-	for (auto [handle, filePath] : m_textureDefinitions)
+	for (auto& [handle, filePath] : m_textureDefinitions)
 	{
 		m_textures.emplace(handle, std::make_shared<Texture>(m_device));
 		m_textures[handle]->loadFromFile(filePath);

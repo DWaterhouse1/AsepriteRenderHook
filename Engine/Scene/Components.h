@@ -20,7 +20,7 @@ struct Material
 {
 	std::shared_ptr<Texture> albedo;
 	std::shared_ptr<Texture> normalMap;
-	VkDescriptorSet materialDescriptor;
+	VkDescriptorSet materialDescriptor = nullptr;
 };
 
 /**
@@ -90,11 +90,21 @@ struct PointLightComponent
 	glm::vec4 lightColor{ 1.0f };
 };
 
+enum class ProjectionType
+{
+	Orthographic,
+	Perspective,
+};
+
 struct CameraComponent
 {
 	CameraComponent() = default;
-	CameraComponent(const glm::mat4& projection) : camera{ projection } {}
+	CameraComponent(const glm::mat4& projection) :
+		camera{ std::make_shared<Camera>(projection) }
+	{}
 
-	Camera camera;
+	bool isActiveCamera = false;
+	ProjectionType projectionType = ProjectionType::Orthographic;
+	std::shared_ptr<Camera> camera{};
 };
 } // namespace wrengine

@@ -36,20 +36,31 @@ void Scene::onSceneStart()
 			script.instance->onCreate();
 		}
 	}
+
+	// find and store the active camera
+	for (auto& [entity, camera] : m_registry.view<CameraComponent>().each())
+	{
+		if (camera.isActiveCamera)
+		{
+			m_activeCamera = camera.camera;
+		}
+	}
 }
+
 
 void Scene::onUpdate(float deltaTime)
 {
-	auto group = m_registry.group<CameraComponent>(entt::get<TransformComponent>);
-	for (auto& [entity, camera, transform] : group.each())
-	{
-
-	}
-
 	// update scripts
 	for (auto& [entity, script] : m_registry.view<ScriptComponent>().each())
 	{
 		script.instance->onUpdate(deltaTime);
+	}
+
+	// update camera positions relative to transform
+	auto group = m_registry.group<CameraComponent>(entt::get<TransformComponent>);
+	for (auto& [entity, camera, transform] : group.each())
+	{
+		camera.camera->setViewDirection(transform.translation, transform.rotation);
 	}
 }
 } // namespace wrengine

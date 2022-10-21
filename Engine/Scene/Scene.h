@@ -27,6 +27,8 @@ public:
 		return m_registry.view<Components...>();
 	}
 
+	std::shared_ptr<Camera> getActiveCamera() { return m_activeCamera; }
+
 	void onSceneStart();
 	void onUpdate(float deltaTime);
 
@@ -34,6 +36,8 @@ private:
 	entt::registry m_registry;
 
 	friend class Entity;
+
+	std::shared_ptr<Camera> m_activeCamera{};
 };
 
 } // namespace wrengine
