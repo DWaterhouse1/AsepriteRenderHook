@@ -9,7 +9,6 @@
 #include "Device.h"
 #include "Pipeline.h"
 #include "Model.h"
-#include "EntityDeprecated.h"
 #include "FrameInfo.h"
 #include "Scene/Scene.h"
 
@@ -41,9 +40,7 @@ public:
 	RenderSystem& operator=(const RenderSystem&) = delete;
 
 	// interface
-	void renderEntities(
-		const FrameInfo& frameInfo,
-		std::vector<EntityDeprecated>& entities);
+	void renderEntities(const FrameInfo& frameInfo);
 
 private:
 	// helper functions
@@ -51,6 +48,8 @@ private:
 		VkDescriptorSetLayout globalSetLayout,
 		VkDescriptorSetLayout materialSetLayout);
 	void createPipeline(VkRenderPass renderPass);
+	void bindQuad(const VkCommandBuffer& frameInfo);
+	void drawQuad(const VkCommandBuffer& frameInfo);
 
 	// vulkan/glfw structures
 	Device& m_device;

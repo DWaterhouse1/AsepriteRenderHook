@@ -62,8 +62,6 @@ add_library(${PROJECT_NAME}
   Swapchain.cpp
   Model.h
   Model.cpp
-  EntityDeprecated.h
-  EntityDeprecated.cpp
   Engine.h 
   Engine.cpp
   RenderSystem.h

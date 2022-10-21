@@ -18,6 +18,7 @@
 struct PushConstantData
 {
 	glm::mat4 transform{ 1.0f };
+	uint32_t shaderConfig = 0;
 };
 
 namespace wrengine
@@ -35,7 +36,7 @@ RenderSystem::RenderSystem(
 	createPipeline(renderPass);
 
 	// initialise quad model data 
-	// TODO do this somewhere else
+	// TODO do this somewhere else, maybe constants header?
 	Model::VertexData vertexData{};
 	vertexData.vertices =
 	{
@@ -123,9 +124,7 @@ void RenderSystem::createPipeline(VkRenderPass renderPass)
 * @param frameInfo Structure describing relevent current frame information.
 * @param entities Vector of Entity objects to render.
 */
-void RenderSystem::renderEntities(
-	const FrameInfo& frameInfo,
-	std::vector<EntityDeprecated>& entities)
+void RenderSystem::renderEntities(const FrameInfo& frameInfo)
 {
 	// TODO handle this more precisely than just throwing an exception.
 	// log and return?
@@ -180,8 +179,30 @@ void RenderSystem::renderEntities(
 			&render.material.materialDescriptor,
 			0, nullptr);
 
-		m_quadModel->bind(frameInfo.commandBuffer);
-		m_quadModel->draw(frameInfo.commandBuffer);
+		bindQuad(frameInfo.commandBuffer);
+		drawQuad(frameInfo.commandBuffer);
 	}
+}
+
+/**
+* Binds the pipeline ready to draw standard quad model.
+*
+* @param commandBuffer The command buffer into which bind commands will be
+* recorded. 
+*/
+void RenderSystem::bindQuad(const VkCommandBuffer& commandBuffer)
+{
+	m_quadModel->bind(commandBuffer);
+}
+
+/**
+* Draws current pipeline state using standard quad model.
+* 
+* @param commandBuffer The command buffer into which draw commands will be
+* recorded.
+*/
+void RenderSystem::drawQuad(const VkCommandBuffer& commandBuffer)
+{
+	m_quadModel->draw(commandBuffer);
 }
 } // namespace wrengine

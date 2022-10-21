@@ -25,6 +25,7 @@ layout(set = 1, binding = 1) uniform sampler2D normalSampler;
 layout(push_constant) uniform Push
 {
 	mat4 transform;
+	uint config;
 } push;
 
 void main()

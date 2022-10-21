@@ -180,7 +180,7 @@ void Engine::run()
 			// render the frame
 			m_userInterface->startFrame();
 			m_renderer.beginSwapchainRenderPass(commandBuffer);
-			renderSystem.renderEntities(frameInfo, m_entities);
+			renderSystem.renderEntities(frameInfo);
 			m_userInterface->getElementManager()->runElements();
 			m_userInterface->render(commandBuffer);
 			m_renderer.endSwapchainRenderPass(commandBuffer);
@@ -343,52 +343,11 @@ void Engine::createMaterialDescriptors()
 */
 void Engine::loadEntities()
 {
-	Model::VertexData vertexData{};
-	//vertexData.vertices =
-	//{
-	//	{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}}, // top right
-	//	{{ 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-	//	{{ 0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}}, // bottom left
-	//	{{-0.5f,  0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
-	//};
-
-	//vertexData.vertices =
-	//{
-	//	{ { 0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-	//	{ { 0.5f,  0.5f}, {0.0f, 1.0f, 0.0f}},
-	//	{ {-0.5f,  0.5f}, {0.0f, 0.0f, 1.0f}},
-	//};
-
-	vertexData.vertices =
-	{
-		{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-		{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-		{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-		{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
-	};
-
-	vertexData.indices = { 0, 1, 2, 2, 3, 0 };
-
-	//std::vector<Model::Vertex> vertices
-	//{
-	//	{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-	//	{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-	//	{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
-	//};
-
-	std::shared_ptr<Model> model = std::make_shared<Model>(m_device, vertexData);
-	//auto texture = std::make_shared<Texture>(m_device);
-	//texture->loadFromFile("bird.png");
-
-	EntityDeprecated triangle = EntityDeprecated::createEntity();
-	triangle.model = model;
-	triangle.texture = m_textures["albedo"];
-	//triangle.texture = texture;
-	triangle.color = { 0.1f, 0.8f, 0.1f };
-	triangle.transform2D.translation.x = 0.0f;
-	triangle.transform2D.scale = { 1.0f, 1.0f };
-	triangle.transform2D.rotation = 0.25f * glm::two_pi<float>();
-	m_entities.push_back(std::move(triangle));
+	/**
+	* TODO use this method to load more complicated entity data. Depends on
+	* asset manager system so data can be saved and later deserialized here.
+	* Currrently only rendering quads for sprites so not necessary yet.
+	*/
 }
 
 void Engine::clearAsyncList()

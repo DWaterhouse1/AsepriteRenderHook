@@ -5,11 +5,9 @@
 #include "Device.h"
 #include "Renderer.h"
 #include "Model.h"
-#include "EntityDeprecated.h"
 #include "Descriptors.h"
 #include "UserInterface.h"
 #include "Texture.h"
-
 #include "Scene/Scene.h"
 #include "Scene/Components.h"
 
@@ -89,7 +87,6 @@ private:
 	std::map<std::string, std::shared_ptr<Texture>> m_textures;
 	std::map<std::string, Material> m_materials;
 	size_t m_textureCount = 0;
-	std::vector<EntityDeprecated> m_entities;
 	std::unique_ptr<UserInterface> m_userInterface{};
 
 	// pre frame execution list
