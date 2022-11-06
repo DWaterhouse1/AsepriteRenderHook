@@ -28,18 +28,15 @@ layout(push_constant) uniform Push
 	uint config;
 } push;
 
-void main()
+vec4 emmisiveColor(vec4 tex)
 {
-	vec3 diffuseLight = ubo.ambientLight.xyz * ubo.ambientLight.w;
+	return tex;
+}
 
-	vec4 texColor = texture(texSampler, fragTexCoord);
+vec4 diffuseColor(vec4 tex)
+{
 	vec4 normalValue = texture(normalSampler, fragTexCoord);
-
-	// TODO actual transparency instead of this silly disarcd thing
-	if (texColor.a < 0.1)
-	{
-		discard;
-	}
+	vec3 diffuseLight = ubo.ambientLight.xyz * ubo.ambientLight.w;
 
 	for (int i = 0; i < ubo.numLights; i++)
 	{
@@ -52,8 +49,28 @@ void main()
 		diffuseLight += intensity * cosAoI;
 	}
 
-	vec3 preadjustColor = vec3(diffuseLight * texColor.rgb);
+	vec3 preadjustColor = vec3(diffuseLight * tex.rgb);
 	float gamma = 2.2;
 	vec3 correctedColor = pow(preadjustColor, vec3(1.0/gamma));
-	outColor = vec4(correctedColor, texColor.a);
+	return vec4(correctedColor, tex.a);
+}
+
+void main()
+{
+	vec4 texColor = texture(texSampler, fragTexCoord);
+	// TODO actual transparency instead of this silly disarcd thing
+	if (texColor.a < 0.1)
+	{
+		discard;
+	}
+
+	switch (push.config)
+	{
+		case 0:
+			outColor = emmisiveColor(texColor); 
+			break;
+		case 1:
+			outColor = diffuseColor(texColor); 
+			break;
+	}
 }

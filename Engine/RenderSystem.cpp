@@ -162,6 +162,7 @@ void RenderSystem::renderEntities(const FrameInfo& frameInfo)
 		transformMat = glm::rotate(transformMat, transform.rotation.z, glm::vec3{ 0.0f, 0.0f, 1.0f });
 
 		push.transform = projectionView * transformMat;
+		push.shaderConfig = static_cast<uint32_t>(render.material.shaderConfig);
 
 		vkCmdPushConstants(
 			frameInfo.commandBuffer,

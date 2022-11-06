@@ -14,6 +14,15 @@ namespace wrengine
 {
 
 /**
+* Shader configuration enum
+*/
+enum class ShaderConfig
+{
+	Emissive = 0,
+	NormalMapped,
+};
+
+/**
 * Struct containing info relevant to material rendering.
 */
 struct Material
@@ -21,6 +30,7 @@ struct Material
 	std::shared_ptr<Texture> albedo;
 	std::shared_ptr<Texture> normalMap;
 	VkDescriptorSet materialDescriptor = nullptr;
+	ShaderConfig shaderConfig = ShaderConfig::Emissive;
 };
 
 /**
@@ -56,8 +66,6 @@ struct TagComponent
 struct SpriteRenderComponent
 {
 	glm::vec4 color{ 1.0f };
-	std::shared_ptr<Texture> texture;
-	std::shared_ptr<Texture> normals;
 	Material material;
 
 	SpriteRenderComponent() = default;

@@ -38,24 +38,32 @@ void AsepriteRenderHook::initEngine()
 		{
 			{"albedo", "Gemstone_Albedo.png"},
 			{"normal", "Gemstone_Normal.png"},
+			{"light",  "light.png"},
 		});
 	m_engine->loadTextures();
 	m_engine->createMaterial("main material", "albedo", "normal");
+	m_engine->createMaterial("light material", "light", "light");
 	std::shared_ptr<wrengine::Scene> activeScene = m_engine->getActiveScene();
 
 	// the sprite
 	wrengine::Entity gemEntity = activeScene->createEntity("main");
-	gemEntity.addComponent<wrengine::SpriteRenderComponent>();
+	auto& renderComponent = gemEntity.addComponent<wrengine::SpriteRenderComponent>();
 	gemEntity.addComponent<wrengine::TransformComponent>();
 	gemEntity.addComponent<wrengine::ScriptComponent>().bind<MovingSprite>();
-	gemEntity.getComponent<wrengine::SpriteRenderComponent>().material.albedo = m_engine->getTextureByName("albedo");
-	gemEntity.getComponent<wrengine::SpriteRenderComponent>().material.normalMap = m_engine->getTextureByName("normal");
+	renderComponent.material.albedo = m_engine->getTextureByName("albedo");
+	renderComponent.material.normalMap = m_engine->getTextureByName("normal");
+	renderComponent.material.shaderConfig = wrengine::ShaderConfig::NormalMapped;
 
 	// point light
 	wrengine::Entity lightEntity = activeScene->createEntity("light");
 	lightEntity.addComponent<wrengine::PointLightComponent>();
-	lightEntity.addComponent<wrengine::TransformComponent>();
 	lightEntity.addComponent<wrengine::ScriptComponent>().bind<PointLightController>();
+	auto& lightTransformComponent = lightEntity.addComponent<wrengine::TransformComponent>();
+	auto& lightRenderComponent = lightEntity.addComponent<wrengine::SpriteRenderComponent>();
+	lightTransformComponent.scale = glm::vec3(0.2f);
+	lightRenderComponent.material.albedo = m_engine->getTextureByName("light");
+	lightRenderComponent.material.normalMap = m_engine->getTextureByName("light");
+	lightRenderComponent.material.shaderConfig = wrengine::ShaderConfig::Emissive;
 
 	// the camera
 	wrengine::Entity cameraEntity = activeScene->createEntity("camera");

@@ -24,16 +24,17 @@ VkResult CreateDebugUtilsMessengerEXT(
 	VkInstance instance,
 	const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
 	const VkAllocationCallbacks* pAllocator,
-	VkDebugUtilsMessengerEXT* pDebugMessenger
-) 
+	VkDebugUtilsMessengerEXT* pDebugMessenger) 
 {
 	auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
 		instance,
 		"vkCreateDebugUtilsMessengerEXT");
-	if (func != nullptr) {
+	if (func != nullptr)
+	{
 		return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
 	}
-	else {
+	else
+	{
 		return VK_ERROR_EXTENSION_NOT_PRESENT;
 	}
 }
@@ -41,8 +42,7 @@ VkResult CreateDebugUtilsMessengerEXT(
 void DestroyDebugUtilsMessengerEXT(
 	VkInstance instance,
 	VkDebugUtilsMessengerEXT debugMessenger,
-	const VkAllocationCallbacks* pAllocator
-) 
+	const VkAllocationCallbacks* pAllocator) 
 {
 	auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(
 		instance,
@@ -200,8 +200,7 @@ void Device::createBuffer(
 	VkBufferUsageFlags usage,
 	VkMemoryPropertyFlags properties,
 	VkBuffer& buffer,
-	VkDeviceMemory& bufferMemory
-)
+	VkDeviceMemory& bufferMemory)
 {
 	VkBufferCreateInfo bufferInfo{};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -359,8 +358,7 @@ void Device::createImageWithInfo(
 	const VkImageCreateInfo& imageInfo,
 	VkMemoryPropertyFlags properties,
 	VkImage& image,
-	VkDeviceMemory& imageMemory
-)
+	VkDeviceMemory& imageMemory)
 {
 	if (vkCreateImage(m_device, &imageInfo, nullptr, &image) != VK_SUCCESS)
 	{
@@ -637,7 +635,8 @@ std::vector<const char*> Device::getRequiredExtensions()
 		glfwExtensions,
 		glfwExtensions + glfwExtensionCount);
 
-	if (enableValidationLayers) {
+	if (enableValidationLayers)
+	{
 		extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 	}
 
@@ -656,17 +655,21 @@ bool Device::checkValidationLayerSupport()
 	std::vector<VkLayerProperties> availableLayers(layerCount);
 	vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
 
-	for (const char* layerName : validationLayers) {
+	for (const char* layerName : validationLayers)
+	{
 		bool layerFound = false;
 
-		for (const auto& layerProperties : availableLayers) {
-			if (strcmp(layerName, layerProperties.layerName) == 0) {
+		for (const auto& layerProperties : availableLayers)
+		{
+			if (strcmp(layerName, layerProperties.layerName) == 0)
+			{
 				layerFound = true;
 				break;
 			}
 		}
 
-		if (!layerFound) {
+		if (!layerFound)
+		{
 			return false;
 		}
 	}
@@ -768,7 +771,7 @@ void Device::hasGlfwRequiredInstanceExtensions()
 
 	std::cout << "required extensions:" << std::endl;
 	std::vector<const char*> requiredExtensions = getRequiredExtensions();
-	for (const auto& required : requiredExtensions)
+	for (const char* const required : requiredExtensions)
 	{
 		std::cout << "\t" << required << std::endl;
 		if (available.find(required) == available.end())
