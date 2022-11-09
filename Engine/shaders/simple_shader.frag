@@ -26,6 +26,7 @@ layout(push_constant) uniform Push
 {
 	mat4 transform;
 	uint config;
+	vec4 normalTransform;
 } push;
 
 vec4 emmisiveColor(vec4 tex)
@@ -36,6 +37,7 @@ vec4 emmisiveColor(vec4 tex)
 vec4 diffuseColor(vec4 tex)
 {
 	vec4 normalValue = texture(normalSampler, fragTexCoord);
+	normalValue *= push.normalTransform;
 	vec3 diffuseLight = ubo.ambientLight.xyz * ubo.ambientLight.w;
 
 	for (int i = 0; i < ubo.numLights; i++)

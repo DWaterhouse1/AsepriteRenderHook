@@ -14,11 +14,13 @@
 
 /**
 * Simple struct for push constants. Contains transform, offset and color data.
+* w element of normalsTransform is padding.
 */
 struct PushConstantData
 {
 	glm::mat4 transform{ 1.0f };
 	uint32_t shaderConfig = 0;
+	alignas(16) glm::vec4 normalsTransform = { 1.0f, -1.0f, 1.0f, 0.0f };
 };
 
 namespace wrengine
@@ -53,6 +55,11 @@ RenderSystem::RenderSystem(
 RenderSystem::~RenderSystem()
 {
 	vkDestroyPipelineLayout(m_device.device(), m_pipelineLayout, nullptr);
+}
+
+void RenderSystem::updateNormalCoords(glm::vec3 scales)
+{
+	m_normalCoordScales = scales;
 }
 
 /**
@@ -163,6 +170,7 @@ void RenderSystem::renderEntities(const FrameInfo& frameInfo)
 
 		push.transform = projectionView * transformMat;
 		push.shaderConfig = static_cast<uint32_t>(render.material.shaderConfig);
+		push.normalsTransform = glm::vec4{ m_normalCoordScales, 0.0f };
 
 		vkCmdPushConstants(
 			frameInfo.commandBuffer,

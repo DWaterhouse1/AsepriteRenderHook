@@ -148,6 +148,12 @@ void Engine::run()
 
 		clearAsyncList();
 
+		if (m_normalCoordsDirty)
+		{
+			renderSystem.updateNormalCoords(m_coordinateScales);
+			m_normalCoordsDirty = false;
+		}
+
 		m_userInterface->getElementManager()->tickElements(frameTime);
 
 		// -------------  begin frame --------------
@@ -303,6 +309,12 @@ Material Engine::getMaterialByName(const std::string& name)
 	auto texIt = m_materials.find(name);
 	assert(texIt != m_materials.end() && "failed to find material!");
 	return m_materials[name];
+}
+
+void Engine::setNormalCoordinateScales(float x, float y, float z)
+{
+	m_coordinateScales = glm::vec3{x, y, z};
+	m_normalCoordsDirty = true;
 }
 
 //  Interface end  ----------------------------------

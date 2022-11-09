@@ -26,6 +26,7 @@ layout(push_constant) uniform Push
 {
 	mat4 transform;
 	uint config;
+	vec4 normalTransform;
 } push;
 
 void main()

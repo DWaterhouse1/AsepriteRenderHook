@@ -5,7 +5,7 @@
 void PointLightController::onCreate()
 {
 	m_transformComponent = &getComponent<wrengine::TransformComponent>();
-	m_transformComponent->translation = glm::vec3(0.8f, 0.8f, 0.5f);
+	m_transformComponent->translation = glm::vec3(0.8f, -0.8f, 0.5f);
 }
 
 void PointLightController::onUpdate(float deltaTime)

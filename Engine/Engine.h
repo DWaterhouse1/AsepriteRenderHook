@@ -61,6 +61,7 @@ public:
 		const std::string& albedoName,
 		const std::string& normalMapName);
 	Material getMaterialByName(const std::string& name);
+	void setNormalCoordinateScales(float x, float y, float z);
 
 private:
 	void loadEntities();
@@ -98,5 +99,9 @@ private:
 
 	// initialisation flags
 	bool m_texturesLoaded;
+
+	// normal map coordinate scales
+	glm::vec3 m_coordinateScales = { 1.0f, -1.0f, 1.0f };
+	bool m_normalCoordsDirty = false;
 };
 } // namespace wrengine

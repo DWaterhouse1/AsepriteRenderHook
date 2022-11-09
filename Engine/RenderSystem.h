@@ -41,6 +41,7 @@ public:
 
 	// interface
 	void renderEntities(const FrameInfo& frameInfo);
+	void updateNormalCoords(glm::vec3 scales);
 
 private:
 	// helper functions
@@ -61,5 +62,8 @@ private:
 
 	// TODO figure out a better system for drawing quads
 	std::unique_ptr<Model> m_quadModel;
+
+	// normal coordinates
+	glm::vec3 m_normalCoordScales{ 1.0f, -1.0f, 1.0f };
 };
 } // namespace wrengine
