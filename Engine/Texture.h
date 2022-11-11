@@ -27,11 +27,14 @@ public:
 	Texture& operator=(const Texture&) = delete;
 
 	void loadFromFile(std::string filePath);
+	void loadFromData(void* data, int width, int height);
 	VkDescriptorImageInfo descriptorInfo();
 	void updateTextureData(void* data);
 
 private:
+	void load(void* data);
 	void createTextureBuffer();
+	void createTextureBuffer(void* data, int width, int height);
 	void createImage();
 	void transitionImageLayout(
 		VkFormat format,

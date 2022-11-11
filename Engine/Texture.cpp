@@ -30,7 +30,7 @@ Texture::~Texture()
 }
 
 /**
-* Loads an image from file into Vulkan texture structures Will throw a runtime
+* Loads an image from file into Vulkan texture structures. Will throw a runtime
 * error on failure to read the image.
 */
 void Texture::loadFromFile(std::string filePath)
@@ -61,6 +61,19 @@ void Texture::loadFromFile(std::string filePath)
 	}
 
 	createTextureBuffer();
+}
+
+/**
+* Loads the data from given data ptr in to Vulkan texture structures. Assumes
+* the use of 4 channel R8B8G8A8 data.
+* 
+* @param data Void ptr of the data to write the texture with.
+* @param width The width in pixels of the image data.
+* @param height The height in pixels of the image data.
+*/
+void Texture::loadFromData(void* data, int width, int height)
+{
+	createTextureBuffer(data, width, height);
 }
 
 /**
@@ -128,11 +141,24 @@ void Texture::updateTextureData(void* data)
 }
 
 /**
-* Creates the buffer structures to hold the texture data.
+* Creates the buffer structures to hold the texture data using class member
+* values.
 */
 void Texture::createTextureBuffer()
 {
-	uint32_t imageSize = m_width * m_height;
+	createTextureBuffer(m_stbiData, m_width, m_height);
+}
+
+/**
+* Creates the buffer structures to hold the texture data.
+* 
+* @param data Void ptr of the data to write to buffer.
+* @param width The width in pixels of the image data.
+* @param height The height in pixels of the image data.
+*/
+void Texture::createTextureBuffer(void* data, int width, int height)
+{
+	uint32_t imageSize = width * height;
 	VkDeviceSize pixelSize = 4 * sizeof(unsigned char);
 	VkDeviceSize bufferSize = pixelSize * imageSize;
 
@@ -145,7 +171,7 @@ void Texture::createTextureBuffer()
 	};
 
 	stagingBuffer.map();
-	stagingBuffer.writeToBuffer(m_stbiData);
+	stagingBuffer.writeToBuffer(data);
 
 	m_textureBuffer = std::make_unique<Buffer>(
 		m_device,
