@@ -60,8 +60,10 @@ vec4 diffuseColor(vec4 tex)
 void main()
 {
 	vec4 texColor = texture(texSampler, fragTexCoord);
-	// TODO actual transparency instead of this silly disarcd thing
-	if (texColor.a < 0.1)
+
+	// using alpha from texcolor as a binary mask on opacity, not using any kind
+	// of smooth transparency
+	if (texColor.a < 0.01)
 	{
 		discard;
 	}

@@ -9,6 +9,7 @@
 #include "RenderSystem.h"
 #include "PointLightSystem.h"
 
+// imgui
 #include <imgui.h>
 
 // std
@@ -326,7 +327,7 @@ void Engine::setNormalCoordinateScales(float x, float y, float z)
 */
 void Engine::loadTextures()
 {
-	m_textureCount = m_textureDefinitions.size();
+	m_textureCount += m_textureDefinitions.size();
 	for (auto& [handle, filePath] : m_textureDefinitions)
 	{
 		m_textures.emplace(handle, std::make_shared<Texture>(m_device));
@@ -339,6 +340,23 @@ void Engine::loadTextures()
 		.build();
 
 	m_texturesLoaded = true;
+}
+
+/**
+* Loads a new texture object from the supplied data ptr. Texture objects are
+* stored in texture map with the supplied handle. Assumes that supplied data is
+* in R8B8G8A8 format.
+* 
+* @param handle String used for accessing the constructed texture object.
+* @param data Ptr to the data to be used.
+* @param width Texture width in pixels.
+* @param height Texture dimensions in pixels
+*/
+void Engine::loadTexture(std::string handle, void* data, int width, int height)
+{
+	m_textures.emplace(handle, std::make_shared<Texture>(m_device));
+	m_textures[handle]->loadFromData(data, width, height);
+	m_textureCount++;
 }
 
 /**
