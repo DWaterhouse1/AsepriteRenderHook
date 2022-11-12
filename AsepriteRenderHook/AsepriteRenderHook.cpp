@@ -20,6 +20,10 @@ AsepriteRenderHook::AsepriteRenderHook()
 void AsepriteRenderHook::run()
 {
 	initServer();
+	std::unique_lock lock(m_conditionMutex);
+	std::cout << "waiting on init msg from aseprite\n";
+	m_initCondition.wait(lock);
+
 	initEngine();
 	m_engine->run();
 }
@@ -36,8 +40,6 @@ void AsepriteRenderHook::initEngine()
 {
 	m_engine->addTextureDependency(
 		{
-			{"albedo", "Gemstone_Albedo.png"},
-			{"normal", "Gemstone_Normal.png"},
 			{"light",  "light.png"},
 		});
 	m_engine->loadTextures();
@@ -80,6 +82,18 @@ void AsepriteRenderHook::initEngine()
 	m_engine->getUIManager()->pushElement<DemoWindow>();
 }
 
+/**
+* Waits on the completion of the init message data, and signals the condition
+* variable to allow main thread to continue running the renderer.
+*/
+void AsepriteRenderHook::initMsgComplete()
+{
+	//m_engine->loadTexture("albedo_", m_diffuseData.data(), m_spriteWidth, m_spriteHeight);
+	//m_engine->loadTexture("normal_", m_normalData.data(),  m_spriteWidth, m_spriteHeight);
+	m_server.sendAll("READY");
+	m_initCondition.notify_one();
+}
+
 void AsepriteRenderHook::messageHandler(WebsocketServer::MessageType message)
 {
 	/**
@@ -94,19 +108,24 @@ void AsepriteRenderHook::messageHandler(WebsocketServer::MessageType message)
 
 	auto begin = message->get_payload().begin() + 12;
 	auto end = message->get_payload().end();
-	std::vector<uint8_t> payload(begin, end);
 
 	int width = hdr[1];
 	int height = hdr[2];
 	std::stringstream ss;
+
+	std::vector<uint8_t> payloadAlbd(begin, begin + (width * height * 4));
+	std::vector<uint8_t> payloadNorm(begin + (width * height * 4), end);
 	
-	if (hdr[0] == 'D')
+	if (hdr[0] == 'R')
 	{
-		m_engine->updateTextureData("albedo", std::move(payload));
+		m_engine->updateTextureData("albedo", std::move(payloadAlbd));
+		m_engine->updateTextureData("normal", std::move(payloadNorm));
 	}
-	else if (hdr[0] == 'N')
+	else if (hdr[0] == 'I')
 	{
-		m_engine->updateTextureData("normal", std::move(payload));
+		m_engine->loadTexture("albedo", payloadAlbd.data(), width, height);
+		m_engine->loadTexture("normal", payloadNorm.data(), width, height);
+		m_initCondition.notify_one();
 	}
 	std::cout << ss.str();
 

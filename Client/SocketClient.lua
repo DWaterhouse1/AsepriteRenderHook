@@ -4,9 +4,11 @@ local spr = app.activeSprite
 
 -- image buffers are necessary to preserve extent data
 -- the cels may not be the same size as the sprite proper
-local buf = Image(spr.width, spr.height, ColorMode.RGB)
+local albdBuf = Image(spr.width, spr.height, ColorMode.RGB)
+local normBuf = Image(spr.width, spr.height, ColorMode.RGB)
 
 local sendImage
+local sendInit
 local onSiteChange
 
 local function finish()
@@ -18,32 +20,74 @@ local function finish()
   spr = nil
 end
 
-sendImage = function()
-	if buf.width ~= spr.width or buf.height	~= spr.height then
-		buf:resize(spr.width, spr.height)
+sendInit = function()
+	if albdBuf.width ~= spr.width or albdBuf.height	~= spr.height
+	then
+		albdBuf:resize(spr.width, spr.height)
 	end
-	
-	--buf:clear()
-	--buf:drawSprite(spr, app.activeFrame.frameNumber)
-	--ws:sendBinary(string.pack("<LLL", string.byte("I"), buf.width, buf.height), buf.bytes)
+
+	if normBuf.width ~= spr.width or normBuf.height	~= spr.height
+	then
+		normBuf:resize(spr.width, spr.height)
+	end
 	
 	for _,layer in ipairs(spr.layers) do
-		if layer.name == "Normal" then
-			buf:clear()
-			buf:drawImage(layer.cels[1].image, layer.cels[1].position)
-			ws:sendBinary(string.pack("<LLL", string.byte("N"), buf.width, buf.height), buf.bytes)
-		elseif layer.name == "Diffuse" then
-			buf:clear()
-			buf:drawImage(layer.cels[1].image, layer.cels[1].position)
-			ws:sendBinary(string.pack("<LLL", string.byte("D"), buf.width, buf.height), buf.bytes)
+		if layer.name == "Normal"
+		then
+			normBuf:clear()
+			normBuf:drawImage(layer.cels[1].image, layer.cels[1].position)
+		end
+
+		if layer.name == "Albedo"
+		then
+			albdBuf:clear()
+			albdBuf:drawImage(layer.cels[1].image, layer.cels[1].position)
 		end
 	end
+
+	ws:sendBinary(
+		string.pack("<LLL", string.byte("I"), albdBuf.width, albdBuf.height),
+		albdBuf.bytes,
+		normBuf.bytes)
+end
+
+sendImage = function()
+	if albdBuf.width ~= spr.width or albdBuf.height	~= spr.height
+	then
+		albdBuf:resize(spr.width, spr.height)
+	end
+
+	if normBuf.width ~= spr.width or normBuf.height	~= spr.height
+	then
+		normBuf:resize(spr.width, spr.height)
+	end
+	
+	for _,layer in ipairs(spr.layers) do
+		if layer.name == "Normal"
+		then
+			normBuf:clear()
+			normBuf:drawImage(layer.cels[1].image, layer.cels[1].position)
+		end
+
+		if layer.name == "Albedo"
+		then
+			albdBuf:clear()
+			albdBuf:drawImage(layer.cels[1].image, layer.cels[1].position)
+		end
+	end
+
+	ws:sendBinary(
+		string.pack("<LLL", string.byte("R"), albdBuf.width, albdBuf.height),
+		albdBuf.bytes,
+		normBuf.bytes)
 end
 
 local frame = -1
 onSiteChange = function()
-	if app.activeSprite ~= spr then
-		for _, s in ipairs(app.sprites) do
+	if app.activeSprite ~= spr
+	then
+		for _, s in ipairs(app.sprites)
+		do
 			if s == spr then
 				break
 			end
@@ -51,7 +95,8 @@ onSiteChange = function()
 		
 		finish()
 	else
-		if app.activeFrame.frameNumber ~= frame then
+		if app.activeFrame.frameNumber ~= frame
+		then
 			frame = app.activeFrame.frameNumber
 			sendImage()
 		end
@@ -59,17 +104,24 @@ onSiteChange = function()
 end
 
 local function receive(t, message)
-    if t == WebSocketMessageType.OPEN then
-        dlg:modify{id="status", text="Sync ON"}
-        spr.events:on('change', sendImage)
-        app.events:on('sitechange', onSiteChange)
-        sendImage()
-
-    elseif t == WebSocketMessageType.CLOSE and dlg ~= nil then
-        dlg:modify{id="status", text="No connection"}
-        spr.events:off(sendImage)
-        app.events:off(onSiteChange)
-    end
+  if t == WebSocketMessageType.OPEN
+  then
+    dlg:modify{id="status", text="Sync ON"}
+		sendInit()
+  elseif t == WebSocketMessageType.CLOSE and dlg ~= nil
+	then
+		dlg:modify{id="status", text="No connection"}
+		spr.events:off(sendImage)
+		app.events:off(onSiteChange)
+	elseif t == WebSocketMessageType.TEXT
+	then
+		print(message)
+		if message == "READY"
+		then
+			spr.events:on('change', sendImage)
+			app.events:on('sitechange', onSiteChange)
+		end
+  end
 end
 
 ws = WebSocket{ url="ws://localhost:30001", onreceive=receive, deflate=false}

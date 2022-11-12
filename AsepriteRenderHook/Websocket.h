@@ -15,6 +15,11 @@
 #include <mutex>
 #include <iostream>
 
+namespace
+{
+namespace OpCode = websocketpp::frame::opcode;
+} // namespace
+
 class WebsocketServer
 {
 public:
@@ -28,6 +33,7 @@ public:
 	WebsocketServer(const WebsocketServer&) = delete;
 	WebsocketServer& operator=(const WebsocketServer&) = delete;
 	void bindMessageHandler(std::function<void(MessageType)> callback);
+	void sendAll(std::string msg, OpCode::value opCode = OpCode::TEXT);
 
 private:
 	void onOpen(Endpoint* endpoint, websocketpp::connection_hdl handle);

@@ -73,6 +73,7 @@ void Texture::loadFromFile(std::string filePath)
 */
 void Texture::loadFromData(void* data, int width, int height)
 {
+	m_numChannels = 4;
 	createTextureBuffer(data, width, height);
 }
 
@@ -158,6 +159,8 @@ void Texture::createTextureBuffer()
 */
 void Texture::createTextureBuffer(void* data, int width, int height)
 {
+	m_width = width;
+	m_height = height;
 	uint32_t imageSize = width * height;
 	VkDeviceSize pixelSize = 4 * sizeof(unsigned char);
 	VkDeviceSize bufferSize = pixelSize * imageSize;

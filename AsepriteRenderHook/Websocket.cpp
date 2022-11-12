@@ -72,6 +72,16 @@ void WebsocketServer::bindMessageHandler(std::function<void(MessageType)> callba
 	m_messageCallback = callback;
 }
 
+void WebsocketServer::sendAll(std::string msg, OpCode::value opCode)
+{
+	std::unique_lock lock(m_connectionMutex);
+	for (auto& hdl : m_connections)
+	{
+		auto connection = m_endpoint.get_con_from_hdl(hdl);
+		connection->send(msg, opCode);
+	}
+}
+
 void WebsocketServer::onOpen(
 	Endpoint* endpoint,
 	websocketpp::connection_hdl handle)
