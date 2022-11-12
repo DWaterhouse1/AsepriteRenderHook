@@ -38,6 +38,10 @@ void AsepriteRenderHook::initServer()
 
 void AsepriteRenderHook::initEngine()
 {
+	m_engine->setPostConstructCallback([&] {
+		m_server.sendAll("READY");
+	});
+
 	m_engine->addTextureDependency(
 		{
 			{"light",  "light.png"},
@@ -82,25 +86,14 @@ void AsepriteRenderHook::initEngine()
 	m_engine->getUIManager()->pushElement<DemoWindow>();
 }
 
-/**
-* Waits on the completion of the init message data, and signals the condition
-* variable to allow main thread to continue running the renderer.
-*/
-void AsepriteRenderHook::initMsgComplete()
-{
-	//m_engine->loadTexture("albedo_", m_diffuseData.data(), m_spriteWidth, m_spriteHeight);
-	//m_engine->loadTexture("normal_", m_normalData.data(),  m_spriteWidth, m_spriteHeight);
-	m_server.sendAll("READY");
-	m_initCondition.notify_one();
-}
-
 void AsepriteRenderHook::messageHandler(WebsocketServer::MessageType message)
 {
 	/**
 	* the aseprite lua client will send payload data as a header of 3 ulong types.
-	* The first tells us whether the payload is data from the normal map or the
-	* sprite albedo. The second and third are width/height dimensions. Payload
-	* follows as uint8_t types in sets of 4 RGBA.
+	* The first tells us whether the payload is init or post init. The second and
+	* third are width/height dimensions in pixels. Payload follows as uint8_t
+	* types in sets of 4 RGBA. Sprite albedo valeus and normal map values are
+	* packaged sequentially.
 	*/
 	static int diffuseCount = 0;
 	static int normalCount = 0;

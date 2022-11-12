@@ -63,6 +63,7 @@ public:
 		const std::string& normalMapName);
 	Material getMaterialByName(const std::string& name);
 	void setNormalCoordinateScales(float x, float y, float z);
+	void setPostConstructCallback(std::function<void()> callback);
 
 private:
 	void loadEntities();
@@ -94,6 +95,9 @@ private:
 	// pre frame execution list
 	std::vector<std::function<void()>> m_functionList;
 	std::mutex m_functionMutex;
+
+	// post construct callback
+	std::function<void()> m_postConstructCallback;
 
 	// scene containing the ecs registry
 	std::shared_ptr<Scene> m_scene;

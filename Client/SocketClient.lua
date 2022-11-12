@@ -115,11 +115,14 @@ local function receive(t, message)
 		app.events:off(onSiteChange)
 	elseif t == WebSocketMessageType.TEXT
 	then
-		print(message)
-		if message == "READY"
+		if message == "READY" or message == "WAKE"
 		then
 			spr.events:on('change', sendImage)
 			app.events:on('sitechange', onSiteChange)
+		elseif message == "SLEEP"
+		then
+			spr.events:off(sendImage)
+			app.events:off(onSiteChange)
 		end
   end
 end

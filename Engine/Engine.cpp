@@ -127,6 +127,7 @@ void Engine::run()
 	PointLightSystem pointLightSystem{ m_scene };
 
 	m_scene->onSceneStart();
+	if (m_postConstructCallback) m_postConstructCallback();
 
 	std::chrono::steady_clock::time_point currentTime =
 		std::chrono::high_resolution_clock::now();
@@ -316,6 +317,11 @@ void Engine::setNormalCoordinateScales(float x, float y, float z)
 {
 	m_coordinateScales = glm::vec3{x, y, z};
 	m_normalCoordsDirty = true;
+}
+
+void Engine::setPostConstructCallback(std::function<void()> callback)
+{
+	m_postConstructCallback = callback;
 }
 
 //  Interface end  ----------------------------------

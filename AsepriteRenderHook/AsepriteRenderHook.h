@@ -50,8 +50,6 @@ private:
 
 	void messageHandler(WebsocketServer::MessageType message);
 
-	void initMsgComplete();
-
 	// image dimensions
 	const uint32_t WIDTH = 800;
 	const uint32_t HEIGHT = 600;
