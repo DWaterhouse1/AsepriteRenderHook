@@ -37,6 +37,7 @@ public:
 	VkCommandBuffer getCurrentCommandBuffer() const;
 	VkRenderPass getSwapchainRenderPass() const;
 	float getAspectRatio() const { return m_swapchain->extentAspectRatio(); }
+	VkExtent2D getExtent() const { return m_swapchain->getSwapChainExtent(); }
 	void waitIdle();
 	int getFrameIndex() const;
 	size_t getImageCount() { return m_swapchain->imageCount(); }

@@ -7,6 +7,7 @@ WebsocketServer::WebsocketServer(uint16_t port) : m_port{ port }
 	m_endpoint.clear_error_channels(websocketpp::log::elevel::all);
 
 	m_endpoint.init_asio();
+	m_endpoint.start_perpetual();
 
 	// internal message callback
 	m_endpoint.set_message_handler(websocketpp::lib::bind(

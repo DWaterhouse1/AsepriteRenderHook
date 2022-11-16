@@ -54,7 +54,12 @@ public:
 	void updateTextureData(std::string textureName, std::vector<uint8_t> data);
 	std::shared_ptr<ElementManager> getUIManager();
 	void loadTextures();
-	void loadTexture(std::string handle, void* data, int width, int height);
+	void loadTexture(
+		std::string handle,
+		void* data,
+		int width,
+		int height,
+		TextureConfigInfo configInfo);
 	std::shared_ptr<Scene> getActiveScene();
 	std::shared_ptr<Texture> getTextureByName(const std::string& name);
 	void createMaterial(

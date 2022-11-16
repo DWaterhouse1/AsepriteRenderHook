@@ -13,3 +13,6 @@
 #include "Scene/Components.h"
 #include "Scene/ScriptableEntity.h"
 #include "entt/entt.hpp"
+
+// constants
+#include "Constants.h"

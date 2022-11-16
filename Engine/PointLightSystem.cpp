@@ -19,11 +19,14 @@ void PointLightSystem::update(GlobalUbo& ubo)
 	auto pointLightView = activeSceneLock->getAllEntitiesWith<
 		TransformComponent,
 		PointLightComponent>();
+	std::shared_ptr<Camera> camera = activeSceneLock->getActiveCamera();
 
 	size_t lightIndex = 0;
 	for (auto&& [entity, transform, light] : pointLightView.each())
 	{
-		ubo.pointLights[lightIndex].position = glm::vec4{ transform.translation, 0.0f };
+		glm::vec4 lightPos = glm::vec4{ transform.translation, 0.0f };
+		lightPos = camera->getProjection() * lightPos;
+		ubo.pointLights[lightIndex].position = lightPos;
 		ubo.pointLights[lightIndex].color = light.lightColor;
 		lightIndex++;
 	}

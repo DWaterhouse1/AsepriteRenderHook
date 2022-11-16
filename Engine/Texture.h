@@ -4,6 +4,7 @@
 
 #include "Device.h"
 #include "Buffer.h"
+#include "Constants.h"
 
 // std
 #include <string>
@@ -11,6 +12,14 @@
 
 namespace wrengine
 {
+/**
+* Struct for texture configuration options.
+*/
+struct TextureConfigInfo
+{
+	VkFilter filterType = VK_FILTER_LINEAR;
+};
+
 /**
 * Encapsulation of texture resources. Can read images from file and load into
 * the Vulkan image and image memory structures. Provides image views and texture
@@ -27,12 +36,20 @@ public:
 	Texture& operator=(const Texture&) = delete;
 
 	void loadFromFile(std::string filePath);
-	void loadFromData(void* data, int width, int height);
+	void loadFromFile(std::string filePath, TextureConfigInfo configInfo);
+	void loadFromData(
+		void* data,
+		int width,
+		int height);
+	void loadFromData(
+		void* data,
+		int width,
+		int height,
+		TextureConfigInfo configInfo);
 	VkDescriptorImageInfo descriptorInfo();
 	void updateTextureData(void* data);
 
 private:
-	void load(void* data);
 	void createTextureBuffer();
 	void createTextureBuffer(void* data, int width, int height);
 	void createImage();
@@ -55,5 +72,8 @@ private:
 	int m_width{};
   int m_height{};
 	int m_numChannels{};
+
+	// config options
+	TextureConfigInfo m_configInfo{};
 };
 } // namespace wrengine

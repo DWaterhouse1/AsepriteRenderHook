@@ -88,7 +88,8 @@ add_library(${PROJECT_NAME}
   PointLightSystem.h
   PointLightSystem.cpp
   Camera.h
-  Camera.cpp)
+  Camera.cpp
+  Constants.h)
 
 target_include_directories( ${PROJECT_NAME}
 	PUBLIC

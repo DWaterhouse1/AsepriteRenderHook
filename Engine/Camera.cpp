@@ -21,6 +21,8 @@ void Camera::setOrthographicProjection(
 	m_projection[3][0] = -(rightPlane + leftPlane) / (rightPlane - leftPlane);
 	m_projection[3][1] = -(bottomPlane + topPlane) / (bottomPlane - topPlane);
 	m_projection[3][2] = -nearPlane / (farPlane - nearPlane);
+
+	computeInverseProjection();
 }
 
 void Camera::setPerspectiveProjection(
@@ -37,6 +39,8 @@ void Camera::setPerspectiveProjection(
 	m_projection[2][2] = farPlane / (farPlane - nearPlane);
 	m_projection[2][3] = 1.0f;
 	m_projection[3][2] = -(farPlane * nearPlane) / (farPlane - nearPlane);
+
+	computeInverseProjection();
 }
 
 void Camera::setViewDirection(
@@ -103,5 +107,10 @@ void Camera::setViewEulerYXZ(
 	m_view[3][0] = -glm::dot(u, position);
 	m_view[3][1] = -glm::dot(v, position);
 	m_view[3][2] = -glm::dot(w, position);
+}
+
+void Camera::computeInverseProjection()
+{
+	m_inverseProjection = glm::inverse(m_projection);
 }
 } // namespace wrengine

@@ -173,11 +173,15 @@ void Engine::run()
 			// FRAME PHASE 1
 			// prepare and update objects in memory
 			m_scene->onUpdate(frameTime);
-			float aspect = m_renderer.getAspectRatio();
+
+			VkExtent2D frameExtent = m_renderer.getExtent();
 			m_scene->getActiveCamera()->setOrthographicProjection(
-				-aspect, aspect,
-				-1, 1,
-				-1, 1);
+				-(static_cast<float>(frameExtent.width)  / 2),
+				 (static_cast<float>(frameExtent.width)  / 2),
+				-(static_cast<float>(frameExtent.height) / 2),
+				 (static_cast<float>(frameExtent.height) / 2),
+				-1.0f,
+				 1.0f);
 
 			GlobalUbo ubo{};
 			pointLightSystem.update(ubo);
@@ -245,6 +249,11 @@ void Engine::addTextureDependency(std::map<std::string, std::string> filePaths)
 	m_textureDefinitions.insert(filePaths.begin(), filePaths.end());
 }
 
+/**
+* Gets the UI manager class instance.
+* 
+* @return Shared ptr to the UI manager.
+*/
 std::shared_ptr<ElementManager> Engine::getUIManager()
 {
 	return m_userInterface->getElementManager();
@@ -358,7 +367,12 @@ void Engine::loadTextures()
 * @param width Texture width in pixels.
 * @param height Texture dimensions in pixels
 */
-void Engine::loadTexture(std::string handle, void* data, int width, int height)
+void Engine::loadTexture(
+	std::string handle,
+	void* data,
+	int width,
+	int height,
+	TextureConfigInfo configInfo)
 {
 	m_textures.emplace(handle, std::make_shared<Texture>(m_device));
 	m_textures[handle]->loadFromData(data, width, height);

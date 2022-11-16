@@ -116,8 +116,11 @@ void AsepriteRenderHook::messageHandler(WebsocketServer::MessageType message)
 	}
 	else if (hdr[0] == 'I')
 	{
-		m_engine->loadTexture("albedo", payloadAlbd.data(), width, height);
-		m_engine->loadTexture("normal", payloadNorm.data(), width, height);
+		wrengine::TextureConfigInfo configInfo{
+			.filterType = WR_FILTER_NEAREST,
+		};
+		m_engine->loadTexture("albedo", payloadAlbd.data(), width, height, configInfo);
+		m_engine->loadTexture("normal", payloadNorm.data(), width, height, configInfo);
 		m_initCondition.notify_one();
 	}
 	std::cout << ss.str();

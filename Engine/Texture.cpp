@@ -32,6 +32,9 @@ Texture::~Texture()
 /**
 * Loads an image from file into Vulkan texture structures. Will throw a runtime
 * error on failure to read the image.
+* 
+* @param filePath The relative file path to the file containing image data to
+* be used to construct the texture.
 */
 void Texture::loadFromFile(std::string filePath)
 {
@@ -64,6 +67,21 @@ void Texture::loadFromFile(std::string filePath)
 }
 
 /**
+* Loads an image from file into Vulkan texture structures and specifies
+* configuration options. Will throw a runtime error on failure to read the
+* image.
+*
+* @param filePath The relative file path to the file containing image data to
+* be used to construct the texture.
+* @param configInfo The struct with specified configuration options.
+*/
+void Texture::loadFromFile(std::string filePath, TextureConfigInfo configInfo)
+{
+	m_configInfo = configInfo;
+	this->loadFromFile(std::move(filePath));
+}
+
+/**
 * Loads the data from given data ptr in to Vulkan texture structures. Assumes
 * the use of 4 channel R8B8G8A8 data.
 * 
@@ -71,10 +89,31 @@ void Texture::loadFromFile(std::string filePath)
 * @param width The width in pixels of the image data.
 * @param height The height in pixels of the image data.
 */
-void Texture::loadFromData(void* data, int width, int height)
+void Texture::loadFromData(
+	void* data,
+	int width,
+	int height)
 {
 	m_numChannels = 4;
 	createTextureBuffer(data, width, height);
+}
+
+/**
+* Loads the data from given data ptr in to Vulkan texture structures and
+* specifies configuration options. Assumes the use of 4 channel R8B8G8A8 data.
+*
+* @param data Void ptr of the data to write the texture with.
+* @param width The width in pixels of the image data.
+* @param height The height in pixels of the image data.
+*/
+void Texture::loadFromData(
+	void* data,
+	int width,
+	int height,
+	TextureConfigInfo configInfo)
+{
+	m_configInfo = configInfo;
+	this->loadFromData(data, width, height);
 }
 
 /**
@@ -362,8 +401,8 @@ void Texture::createTextureSampler()
 {
 	VkSamplerCreateInfo samplerInfo{};
 	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-	samplerInfo.magFilter = VK_FILTER_LINEAR;
-	samplerInfo.minFilter = VK_FILTER_LINEAR;
+	samplerInfo.magFilter = m_configInfo.filterType;
+	samplerInfo.minFilter = m_configInfo.filterType;
 	samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 	samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 	samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
