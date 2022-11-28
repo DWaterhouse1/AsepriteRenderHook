@@ -423,6 +423,17 @@ void Device::createInstance()
 		createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
 		createInfo.ppEnabledLayerNames = validationLayers.data();
 		populateDebugMessengerCreateInfo(debugCreateInfo);
+
+		VkValidationFeatureEnableEXT enables[] =
+		{
+			VK_VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT,
+		};
+		VkValidationFeaturesEXT features = {};
+		features.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
+		features.enabledValidationFeatureCount = 1;
+		features.pEnabledValidationFeatures = enables;
+		debugCreateInfo.pNext = &features;
+
 		createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
 	}
 	else
@@ -736,6 +747,7 @@ void Device::populateDebugMessengerCreateInfo(
 	createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
 	createInfo.messageSeverity =
+		//VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT		|
 		VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
 		VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
 	createInfo.messageType =

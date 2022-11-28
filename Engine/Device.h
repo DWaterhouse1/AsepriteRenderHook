@@ -133,7 +133,8 @@ private:
 	};
 	const std::vector<const char*> deviceExtensions =
 	{
-		VK_KHR_SWAPCHAIN_EXTENSION_NAME
+		VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+		"VK_KHR_shader_non_semantic_info"
 	};
 };
 } // namespace wrengine

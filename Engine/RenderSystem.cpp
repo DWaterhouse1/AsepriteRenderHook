@@ -18,7 +18,7 @@
 */
 struct PushConstantData
 {
-	glm::mat4 transform{ 1.0f };
+	glm::mat4 model{ 1.0f };
 	uint32_t shaderConfig = 0;
 	alignas(16) glm::vec4 normalsTransform = { 1.0f, -1.0f, 1.0f, 0.0f };
 };
@@ -162,13 +162,13 @@ void RenderSystem::renderEntities(const FrameInfo& frameInfo)
 	{
 		PushConstantData push{};
 
-		glm::mat4 transformMat = glm::translate(glm::mat4{ 1.0f }, transform.translation);
-		transformMat = glm::scale(transformMat, transform.scale);
-		transformMat = glm::rotate(transformMat, transform.rotation.y, glm::vec3{ 0.0f, 1.0f, 0.0f });
-		transformMat = glm::rotate(transformMat, transform.rotation.x, glm::vec3{ 1.0f, 0.0f, 0.0f });
-		transformMat = glm::rotate(transformMat, transform.rotation.z, glm::vec3{ 0.0f, 0.0f, 1.0f });
+		glm::mat4 model = glm::translate(glm::mat4{ 1.0f }, transform.translation);
+		model = glm::scale(model, transform.scale);
+		model = glm::rotate(model, transform.rotation.y, glm::vec3{ 0.0f, 1.0f, 0.0f });
+		model = glm::rotate(model, transform.rotation.x, glm::vec3{ 1.0f, 0.0f, 0.0f });
+		model = glm::rotate(model, transform.rotation.z, glm::vec3{ 0.0f, 0.0f, 1.0f });
 
-		push.transform = projectionView * transformMat;
+		push.model = model;
 		push.shaderConfig = static_cast<uint32_t>(render.material.shaderConfig);
 		push.normalsTransform = glm::vec4{ m_normalCoordScales, 0.0f };
 

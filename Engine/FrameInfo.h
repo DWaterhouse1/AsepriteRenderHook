@@ -25,6 +25,7 @@ struct PointLight
 */
 struct GlobalUbo
 {
+	glm::mat4 projView{ 1.0f };
 	glm::vec4 ambientLight{ 1.0f, 1.0f, 1.0f, 0.02f };
 	PointLight pointLights[10];
 	uint64_t numLights;

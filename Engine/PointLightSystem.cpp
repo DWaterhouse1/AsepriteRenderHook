@@ -25,7 +25,7 @@ void PointLightSystem::update(GlobalUbo& ubo)
 	for (auto&& [entity, transform, light] : pointLightView.each())
 	{
 		glm::vec4 lightPos = glm::vec4{ transform.translation, 0.0f };
-		lightPos = camera->getProjection() * lightPos;
+		//lightPos = camera->getProjection() * lightPos;
 		ubo.pointLights[lightIndex].position = lightPos;
 		ubo.pointLights[lightIndex].color = light.lightColor;
 		lightIndex++;

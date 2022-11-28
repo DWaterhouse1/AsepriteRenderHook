@@ -184,7 +184,12 @@ void Engine::run()
 				 1.0f);
 
 			GlobalUbo ubo{};
+			// set the point light positions/number
 			pointLightSystem.update(ubo);
+			// set the view and projection matrices from the active camera
+			std::shared_ptr<Camera> camera = m_scene->getActiveCamera();
+			ubo.projView = camera->getProjection() * camera->getView();
+			// write
 			uboBuffers[frameIndex]->writeToBuffer(&ubo);
 			uboBuffers[frameIndex]->flush();
 
@@ -342,7 +347,7 @@ void Engine::setPostConstructCallback(std::function<void()> callback)
 */
 void Engine::loadTextures()
 {
-	m_textureCount += m_textureDefinitions.size();
+	m_textureCount += static_cast<uint32_t>(m_textureDefinitions.size());
 	for (auto& [handle, filePath] : m_textureDefinitions)
 	{
 		m_textures.emplace(handle, std::make_shared<Texture>(m_device));
@@ -372,10 +377,10 @@ void Engine::loadTexture(
 	void* data,
 	int width,
 	int height,
-	TextureConfigInfo configInfo)
+	TextureConfigInfo configInfo = TextureConfigInfo{})
 {
 	m_textures.emplace(handle, std::make_shared<Texture>(m_device));
-	m_textures[handle]->loadFromData(data, width, height);
+	m_textures[handle]->loadFromData(data, width, height, configInfo);
 	m_textureCount++;
 }
 

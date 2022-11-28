@@ -17,6 +17,7 @@ struct PointLight
 
 layout(set = 0, binding = 0) uniform GlobalUbo
 {
+	mat4 projView;
 	vec4 ambientLight;
 	PointLight[10] pointLights;
 	int numLights;
@@ -24,15 +25,15 @@ layout(set = 0, binding = 0) uniform GlobalUbo
 
 layout(push_constant) uniform Push
 {
-	mat4 transform;
+	mat4 model;
 	uint config;
 	vec4 normalTransform;
 } push;
 
 void main()
 {
-	vec4 position = push.transform * vec4(position, 1.0);
-	gl_Position = position;
-	fragPos = position.xyz;
+	vec4 vertexWorldPosition = push.model * vec4(position, 1.0);
+	gl_Position = ubo.projView * vertexWorldPosition;
+	fragPos = vertexWorldPosition.xyz;
 	fragTexCoord = uv;
 }

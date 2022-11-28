@@ -1,5 +1,6 @@
 #version 450
 #extension GL_KHR_vulkan_glsl: enable
+#extension GL_EXT_debug_printf: enable
 
 layout(location = 0) in vec3 fragPos;
 layout(location = 1) in vec2 fragTexCoord;
@@ -14,6 +15,7 @@ struct PointLight
 
 layout(set = 0, binding = 0) uniform GlobalUbo
 {
+	mat4 projView;
 	vec4 ambientLight;
 	PointLight[10] pointLights;
 	int numLights;
@@ -44,7 +46,8 @@ vec4 diffuseColor(vec4 tex)
 	{
 		PointLight light = ubo.pointLights[i];
 		vec3 directionToLight = light.position.xyz - fragPos;
-		float attenuation = 1.0 / dot(directionToLight, directionToLight);
+		float attenuation = 100 * inversesqrt(1 + dot(directionToLight, directionToLight));
+		attenuation = pow(attenuation, 2);
 		float cosAoI = max(dot(normalValue.xyz, normalize(directionToLight)), 0);
 		vec3 intensity = light.color.xyz * light.color.w * attenuation;
 
@@ -72,9 +75,11 @@ void main()
 	{
 		case 0:
 			outColor = emmisiveColor(texColor); 
+			//outColor = vec4(0.3, 0.5, 0.6, 1.0); // for debug
 			break;
 		case 1:
 			outColor = diffuseColor(texColor); 
+			//outColor = vec4(0.6, 0.5, 0.3, 1.0); // for debug
 			break;
 	}
 }

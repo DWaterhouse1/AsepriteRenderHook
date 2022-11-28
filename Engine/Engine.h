@@ -94,7 +94,7 @@ private:
 	std::set<std::pair<std::string, std::string>> m_textureDefinitions;
 	std::map<std::string, std::shared_ptr<Texture>> m_textures;
 	std::map<std::string, Material> m_materials;
-	size_t m_textureCount = 0;
+	uint32_t m_textureCount = 0;
 	std::unique_ptr<UserInterface> m_userInterface{};
 
 	// pre frame execution list
