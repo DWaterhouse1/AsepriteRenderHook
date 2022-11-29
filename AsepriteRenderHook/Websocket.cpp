@@ -40,6 +40,7 @@ WebsocketServer::WebsocketServer(uint16_t port) : m_port{ port }
 WebsocketServer::~WebsocketServer()
 {
 	m_endpoint.stop_listening();
+	m_endpoint.stop_perpetual();
 
 	// close each open connection
 	std::unique_lock<std::mutex> lock(m_connectionMutex);
@@ -53,6 +54,7 @@ WebsocketServer::~WebsocketServer()
 			websocketpp::close::status::normal,
 			"shutdown",
 			errorCode);
+
 		if (errorCode)
 		{
 			std::cerr <<

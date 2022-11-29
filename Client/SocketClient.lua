@@ -113,6 +113,7 @@ local function receive(t, message)
 		dlg:modify{id="status", text="No connection"}
 		spr.events:off(sendImage)
 		app.events:off(onSiteChange)
+		ws:close()
 	elseif t == WebSocketMessageType.TEXT
 	then
 		if message == "READY" or message == "WAKE"

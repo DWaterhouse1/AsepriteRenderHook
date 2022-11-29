@@ -49,6 +49,6 @@ private:
 		websocketpp::connection_hdl,
 		std::owner_less<websocketpp::connection_hdl>> m_connections{};
 	std::thread m_thread;
-	std::function<void(MessageType message)> m_messageCallback;
+	std::function<void(MessageType message)> m_messageCallback = [](auto&&...){};
 	std::mutex m_connectionMutex;
 };
