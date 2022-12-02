@@ -13,29 +13,6 @@
 #include <mutex>
 #include <condition_variable>
 
-class MovingSprite : public wrengine::ScriptableEntity
-{
-public:
-	void onCreate() override
-	{
-		m_transformComponent = &getComponent<wrengine::TransformComponent>();
-		m_transformComponent->translation = { 0.0f, 0.0f, 0.5f };
-		m_transformComponent->scale = { 512.0f, 512.0f, 512.0f };
-	}
-
-	void onUpdate(float deltaTime) override
-	{
-		spritePos += (0.5f * deltaTime);
-		spritePos = std::fmod(spritePos, 360.0f);
-		m_transformComponent->translation.x = 100.0f * std::sin(spritePos);
-	}
-
-private:
-	wrengine::TransformComponent* m_transformComponent = nullptr;
-
-	float spritePos = 0.0f;
-};
-
 class AsepriteRenderHook
 {
 

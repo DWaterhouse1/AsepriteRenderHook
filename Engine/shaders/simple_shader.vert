@@ -35,5 +35,7 @@ void main()
 	vec4 vertexWorldPosition = push.model * vec4(position, 1.0);
 	gl_Position = ubo.projView * vertexWorldPosition;
 	fragPos = vertexWorldPosition.xyz;
+	//debugPrintfEXT("fragPos.x : %f", fragPos.x);
+	//debugPrintfEXT("fragPos.y : %f", fragPos.y);
 	fragTexCoord = uv;
 }

@@ -4,6 +4,7 @@
 #include "AsepriteRenderHook.h"
 
 #include "PointLightController.h"
+#include "SpriteController.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -55,7 +56,7 @@ void AsepriteRenderHook::initEngine()
 	wrengine::Entity gemEntity = activeScene->createEntity("main");
 	auto& renderComponent = gemEntity.addComponent<wrengine::SpriteRenderComponent>();
 	gemEntity.addComponent<wrengine::TransformComponent>();
-	gemEntity.addComponent<wrengine::ScriptComponent>().bind<MovingSprite>();
+	gemEntity.addComponent<wrengine::ScriptComponent>().bind<SpriteController>();
 	renderComponent.material.albedo = m_engine->getTextureByName("albedo");
 	renderComponent.material.normalMap = m_engine->getTextureByName("normal");
 	renderComponent.material.shaderConfig = wrengine::ShaderConfig::NormalMapped;
@@ -111,11 +112,13 @@ void AsepriteRenderHook::messageHandler(WebsocketServer::MessageType message)
 	
 	if (hdr[0] == 'R')
 	{
+		std::cout << "recieved sprite update msg" << std::endl;
 		m_engine->updateTextureData("albedo", std::move(payloadAlbd));
 		m_engine->updateTextureData("normal", std::move(payloadNorm));
 	}
 	else if (hdr[0] == 'I')
 	{
+		std::cout << "recieved init msg" << std::endl;
 		m_engine->loadTexture("albedo", payloadAlbd.data(), width, height, { .filterType = WR_FILTER_NEAREST });
 		m_engine->loadTexture("normal", payloadNorm.data(), width, height, { .filterType = WR_FILTER_NEAREST });
 		m_initCondition.notify_one();

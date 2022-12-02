@@ -12,7 +12,9 @@ add_executable (
 	DemoWindow.h
 	DemoWindow.cpp
 	PointLightController.h
-	PointLightController.cpp)
+	PointLightController.cpp
+	SpriteController.h
+	SpriteController.cpp)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET AsepriteRenderHook PROPERTY CXX_STANDARD 20)

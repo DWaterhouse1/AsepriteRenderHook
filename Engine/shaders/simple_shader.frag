@@ -38,26 +38,28 @@ vec4 emmisiveColor(vec4 tex)
 
 vec4 diffuseColor(vec4 tex)
 {
-	vec4 normalValue = texture(normalSampler, fragTexCoord);
-	normalValue *= push.normalTransform;
-	vec3 diffuseLight = ubo.ambientLight.xyz * ubo.ambientLight.w;
+	//vec4 normalMap = texture(normalSampler, fragTexCoord);
+	vec4 normalMap = vec4(0.0, 0.0, 1.0, 0.0);
+	PointLight light = ubo.pointLights[0];
 
-	for (int i = 0; i < ubo.numLights; i++)
-	{
-		PointLight light = ubo.pointLights[i];
-		vec3 directionToLight = light.position.xyz - fragPos;
-		float attenuation = 100 * inversesqrt(1 + dot(directionToLight, directionToLight));
-		attenuation = pow(attenuation, 2);
-		float cosAoI = max(dot(normalValue.xyz, normalize(directionToLight)), 0);
-		vec3 intensity = light.color.xyz * light.color.w * attenuation;
+	vec3 lightDir = vec3(light.position.xyz - fragPos);
 
-		diffuseLight += intensity * cosAoI;
-	}
+	float D = length(lightDir);
+	vec3 N = normalize(2 * normalMap.rgb - 1);
+	vec3 L = normalize(lightDir);
 
-	vec3 preadjustColor = vec3(diffuseLight * tex.rgb);
-	float gamma = 2.2;
-	vec3 correctedColor = pow(preadjustColor, vec3(1.0/gamma));
-	return vec4(correctedColor, tex.a);
+	N *= push.normalTransform.xyz;
+
+	vec3 diffuse = (light.color.rgb * light.color.a) * max(acos((dot(N, L))), 0);
+	//vec3 diffuse = (light.color.rgb * light.color.a) * max(dot(N, L), 0);
+
+	vec3 ambient = ubo.ambientLight.rgb * ubo.ambientLight.a;
+
+	float attenuation = 50000.0 / (0.4 + (3 * D) + (20 * D * D));
+
+	vec3 intensity = ambient + (diffuse * attenuation);
+	
+	return vec4(tex.rgb * intensity, tex.a);
 }
 
 void main()
@@ -71,15 +73,20 @@ void main()
 		discard;
 	}
 
+	vec4 color;
+
 	switch (push.config)
 	{
 		case 0:
-			outColor = emmisiveColor(texColor); 
-			//outColor = vec4(0.3, 0.5, 0.6, 1.0); // for debug
+			color = emmisiveColor(texColor); 
 			break;
 		case 1:
-			outColor = diffuseColor(texColor); 
-			//outColor = vec4(0.6, 0.5, 0.3, 1.0); // for debug
+			color = diffuseColor(texColor); 
 			break;
 	}
+
+	// gamma correction
+	float gamma = 2.2;
+	vec3 correctedColor = pow(color.rgb, vec3(1.0 / gamma));
+	outColor = vec4(correctedColor, color.a);
 }
