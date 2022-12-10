@@ -65,6 +65,20 @@ int Renderer::getFrameIndex() const
 		"Cannot get frame index when frame is not in progress");
 	return m_currentFrameIndex;
 }
+
+/**
+* Sets the RGB values of the screen clear color.
+* 
+* @param r Red value.
+* @param g Green value.
+* @param b Blue value.
+*/
+void Renderer::setClearColor(float r, float g, float b)
+{
+	m_clearR = r;
+	m_clearG = g;
+	m_clearB = b;
+}
 //  Interface end  ----------------------------------
 
 /**
@@ -230,7 +244,7 @@ void Renderer::beginSwapchainRenderPass(VkCommandBuffer commandBuffer)
 		"can't begin render pass on command buffer from a different frame");
 
 	std::array<VkClearValue, 2> clearValues{};
-	clearValues[0].color = { 0.1f, 0.1f, 0.1f, 1.0f };
+	clearValues[0].color = { m_clearR, m_clearG, m_clearB, 1.0f };
 	clearValues[1].depthStencil = { 1.0f, 0 };
 
 	VkRenderPassBeginInfo renderPassInfo{};

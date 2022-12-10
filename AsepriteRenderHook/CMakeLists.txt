@@ -14,7 +14,9 @@ add_executable (
 	PointLightController.h
 	PointLightController.cpp
 	SpriteController.h
-	SpriteController.cpp)
+	SpriteController.cpp
+	MainWindow.h
+	MainWindow.cpp)
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET AsepriteRenderHook PROPERTY CXX_STANDARD 20)
@@ -32,6 +34,14 @@ target_include_directories( ${PROJECT_NAME}
 	PUBLIC
 		${PROJECT_SOURCE_DIR}
 )
+
+add_custom_target(CopyResources ALL
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+  ${PROJECT_SOURCE_DIR}/Resources
+  ${PROJECT_BINARY_DIR}/Resources
+  COMMENT "Copying resources into binary directory")
+
+add_dependencies(AsepriteRenderHook CopyResources)
 
 target_link_libraries(${PROJECT_NAME}
 	PUBLIC

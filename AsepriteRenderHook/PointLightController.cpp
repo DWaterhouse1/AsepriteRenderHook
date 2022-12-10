@@ -16,5 +16,5 @@ void PointLightController::onUpdate(float deltaTime)
 	float s = std::sin(m_lightAngle);
 	float c = std::cos(m_lightAngle);
 
-	m_transformComponent->translation = 100.0f * glm::vec3(1.5f * s * m_radius, 0.1f * c * m_radius, 0.0f);
+	m_transformComponent->translation = 100.0f * glm::vec3(s * m_radius, c * m_radius, 0.0f);
 }

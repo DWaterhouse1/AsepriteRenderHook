@@ -69,6 +69,7 @@ public:
 	Material getMaterialByName(const std::string& name);
 	void setNormalCoordinateScales(float x, float y, float z);
 	void setPostConstructCallback(std::function<void()> callback);
+	void setClearColor(float r, float g, float b);
 
 private:
 	void loadEntities();
@@ -111,7 +112,7 @@ private:
 	bool m_texturesLoaded;
 
 	// normal map coordinate scales
-	glm::vec3 m_coordinateScales = { 1.0f, -1.0f, 1.0f };
+	glm::vec3 m_coordinateScales = { 1.0f, 1.0f, 1.0f };
 	bool m_normalCoordsDirty = false;
 };
 } // namespace wrengine

@@ -23,7 +23,7 @@ public:
 	ElementManager(ElementManager&&) = default;
 	ElementManager& operator=(ElementManager&&) = default;
 
-	void pushElement(const std::shared_ptr<UIElement>& element);
+	void pushElement(std::shared_ptr<UIElement> element);
 
 	void tickElements(float deltaTime);
 	void runElements();
@@ -41,7 +41,6 @@ public:
 		std::shared_ptr<T> element = std::make_shared<T>();
 		element->onAttach();
 		m_elementStack.push_back(element);
-		//m_elementStack.push_back(std::make_shared<T>())->onAttach();
 	}
 
 private:

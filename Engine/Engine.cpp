@@ -327,15 +327,42 @@ Material Engine::getMaterialByName(const std::string& name)
 	return m_materials[name];
 }
 
+/**
+* Sets scale values for the normal map coordinates used by the shaders. Negative
+* values will invert that axis.
+* 
+* @param x Scale value for the x axis.
+* @param y Scale value for the y axis.
+* @param z Scale value for the z axis.
+*/
 void Engine::setNormalCoordinateScales(float x, float y, float z)
 {
 	m_coordinateScales = glm::vec3{x, y, z};
 	m_normalCoordsDirty = true;
 }
 
+/**
+* Registers a given function to be called after the engine initialization is
+* finished. This function, and any called after it, are able to use all engine
+* runtime features.
+* 
+* @param callback The function to be called post engine initialization.
+*/
 void Engine::setPostConstructCallback(std::function<void()> callback)
 {
 	m_postConstructCallback = callback;
+}
+
+/**
+* Sets the RGB values of the screen clear color.
+*
+* @param r Red value.
+* @param g Green value.
+* @param b Blue value.
+*/
+void Engine::setClearColor(float r, float g, float b)
+{
+	m_renderer.setClearColor(r, g, b);
 }
 
 //  Interface end  ----------------------------------

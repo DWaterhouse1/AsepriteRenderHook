@@ -41,6 +41,7 @@ public:
 	void waitIdle();
 	int getFrameIndex() const;
 	size_t getImageCount() { return m_swapchain->imageCount(); }
+	void setClearColor(float r, float g, float b);
 
 private:
 	// helper functions
@@ -62,5 +63,11 @@ private:
 	Device& m_device;
 	std::unique_ptr<Swapchain> m_swapchain;
 	std::vector<VkCommandBuffer> m_commandBuffers;;
+
+	// clear values
+	float m_clearR = 0.1f;
+	float m_clearG = 0.1f;
+	float m_clearB = 0.1f;
+
 };
 } // namespace wrengine

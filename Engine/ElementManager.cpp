@@ -18,9 +18,9 @@ ElementManager::~ElementManager()
 *
 * @param element Pointer to element to be added to the stack.
 */
-void ElementManager::pushElement(const std::shared_ptr<UIElement>& element)
+void ElementManager::pushElement(std::shared_ptr<UIElement> element)
 {
-	m_elementStack.emplace_back(element);
+	m_elementStack.push_back(element);
 	element->onAttach();
 }
 

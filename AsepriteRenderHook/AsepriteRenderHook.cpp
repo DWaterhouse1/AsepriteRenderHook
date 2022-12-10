@@ -5,6 +5,7 @@
 
 #include "PointLightController.h"
 #include "SpriteController.h"
+#include "MainWindow.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -15,7 +16,7 @@ AsepriteRenderHook::AsepriteRenderHook()
 	configInfo.height = HEIGHT;
 	configInfo.width = WIDTH;
 	configInfo.windowName = "Aseprite Render Hook";
-	m_engine = std::make_unique<wrengine::Engine>(configInfo);
+	m_engine = std::make_shared<wrengine::Engine>(configInfo);
 }
 
 void AsepriteRenderHook::run()
@@ -45,7 +46,7 @@ void AsepriteRenderHook::initEngine()
 
 	m_engine->addTextureDependency(
 		{
-			{"light",  "light.png"},
+			{"light",  "Resources/light.png"},
 		});
 	m_engine->loadTextures();
 	m_engine->createMaterial("main material", "albedo", "normal");
@@ -84,7 +85,10 @@ void AsepriteRenderHook::initEngine()
 	cameraEntity.getComponent<wrengine::TransformComponent>().translation = glm::vec3( 0.0f );
 	cameraEntity.getComponent<wrengine::TransformComponent>().rotation = glm::vec3(0.0f, 0.0f, 1.0f);
 
-	m_engine->getUIManager()->pushElement<DemoWindow>();
+	std::shared_ptr<MainWindow> mainWindow = std::make_shared<MainWindow>(m_engine);
+	mainWindow->setSprite(gemEntity);
+	mainWindow->setLight(lightEntity);
+	m_engine->getUIManager()->pushElement(mainWindow);
 }
 
 void AsepriteRenderHook::messageHandler(WebsocketServer::MessageType message)

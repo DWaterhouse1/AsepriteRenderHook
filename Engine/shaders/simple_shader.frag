@@ -38,8 +38,8 @@ vec4 emmisiveColor(vec4 tex)
 
 vec4 diffuseColor(vec4 tex)
 {
-	//vec4 normalMap = texture(normalSampler, fragTexCoord);
-	vec4 normalMap = vec4(0.0, 0.0, 1.0, 0.0);
+	vec4 normalMap = texture(normalSampler, fragTexCoord);
+	//vec4 normalMap = vec4(0.0, 0.0, 1.0, 0.0);
 	PointLight light = ubo.pointLights[0];
 
 	vec3 lightDir = vec3(light.position.xyz - fragPos);

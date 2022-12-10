@@ -35,7 +35,7 @@ private:
 	const uint16_t PORT = 30001;
 	
 	WebsocketServer m_server{ PORT };
-	std::unique_ptr<wrengine::Engine> m_engine;
+	std::shared_ptr<wrengine::Engine> m_engine;
 
 	// texture data
 	std::mutex m_conditionMutex;
