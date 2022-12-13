@@ -59,6 +59,7 @@ vec4 diffuseColor(vec4 tex)
 
 	vec3 intensity = ambient + (diffuse * attenuation);
 	
+	//return vec4(vec3(0.2) * intensity, tex.a);
 	return vec4(tex.rgb * intensity, tex.a);
 }
 

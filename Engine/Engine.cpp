@@ -132,6 +132,8 @@ void Engine::run()
 	std::chrono::steady_clock::time_point currentTime =
 		std::chrono::high_resolution_clock::now();
 
+	m_window.show();
+
 	while (!m_window.shouldClose())
 	{
 		// note glfwPollEvents() may block, e.g. on window resize

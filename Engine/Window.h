@@ -31,6 +31,7 @@ public:
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
 
+	void show();
 	bool shouldClose() { return glfwWindowShouldClose(m_window); }
 	bool wasResized() { return bFramebufferResized; }
 	void resetWindowResizeFlag() { bFramebufferResized = false; }

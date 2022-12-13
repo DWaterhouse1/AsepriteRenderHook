@@ -3,6 +3,8 @@
 
 void MainWindow::onAttach()
 {
+	m_spriteTransform = &m_mainSprite.getComponent<wrengine::TransformComponent>();
+	m_lightTransform = &m_light.getComponent<wrengine::TransformComponent>();
 }
 
 void MainWindow::onDetatch()
@@ -13,17 +15,6 @@ void MainWindow::onDetatch()
 
 void MainWindow::onUIRender()
 {
-	ImGui::ShowStackToolWindow();
-
-	if (!m_spriteTransform)
-	{
-		m_spriteTransform = &m_mainSprite.getComponent<wrengine::TransformComponent>();
-	}
-	if (!m_spriteTransform)
-	{
-		m_lightTransform = &m_light.getComponent<wrengine::TransformComponent>();
-	}
-
 	if (!ImGui::Begin("Controls"))
 	{
 		// take an early out if the window is collapsed

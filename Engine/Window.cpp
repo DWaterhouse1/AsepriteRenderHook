@@ -19,6 +19,9 @@ Window::Window(
 
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+	
+	// start hidden
+	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
 	m_window = glfwCreateWindow(
 		m_width,
@@ -38,6 +41,14 @@ Window::~Window()
 {
 	glfwDestroyWindow(m_window);
 	glfwTerminate();
+}
+
+/**
+* 
+*/
+void Window::show()
+{
+	glfwShowWindow(m_window);
 }
 
 /**

@@ -4,7 +4,7 @@ void SpriteController::onCreate()
 {
 	m_transformComponent = &getComponent<wrengine::TransformComponent>();
 	m_transformComponent->translation = { 0.0f, 0.0f, 0.5f };
-	m_transformComponent->scale = { 256.0f, 256.0f, 256.0f };
+	m_transformComponent->scale = { 512.0f, 512.0f, 512.0f };
 }
 
 void SpriteController::onUpdate(float deltaTime)
