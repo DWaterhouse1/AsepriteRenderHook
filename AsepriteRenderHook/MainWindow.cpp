@@ -1,6 +1,9 @@
 #include "MainWindow.h"
 #include "imgui.h"
 
+//std
+#include <iostream>
+
 void MainWindow::onAttach()
 {
 	m_spriteTransform = &m_mainSprite.getComponent<wrengine::TransformComponent>();
@@ -57,7 +60,6 @@ void MainWindow::onUIRender()
 
 	ImGui::Separator();
 
-
 	if (ImGui::CollapsingHeader("Position Controls"))
 	{
 		if (ImGui::TreeNode("Sprite"))
@@ -93,6 +95,14 @@ void MainWindow::onUIRender()
 			ImGui::TreePop();
 		}
 	}
+
+	//ImGui::Separator();
+	//const char* items[] = { "A", "B", "C" };
+	//static int currentItem = 0;
+	//if (ImGui::Combo("Sprite Scales", &currentItem, items, IM_ARRAYSIZE(items)))
+	//{
+	//	std::cout << "item: " << currentItem << "\n";
+	//}
 
 	ImGui::End();
 }

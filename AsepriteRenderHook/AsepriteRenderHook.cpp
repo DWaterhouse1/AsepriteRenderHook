@@ -54,13 +54,14 @@ void AsepriteRenderHook::initEngine()
 	std::shared_ptr<wrengine::Scene> activeScene = m_engine->getActiveScene();
 
 	// the sprite
-	wrengine::Entity gemEntity = activeScene->createEntity("main");
-	auto& renderComponent = gemEntity.addComponent<wrengine::SpriteRenderComponent>();
-	gemEntity.addComponent<wrengine::TransformComponent>();
-	gemEntity.addComponent<wrengine::ScriptComponent>().bind<SpriteController>();
-	renderComponent.material.albedo = m_engine->getTextureByName("albedo");
-	renderComponent.material.normalMap = m_engine->getTextureByName("normal");
-	renderComponent.material.shaderConfig = wrengine::ShaderConfig::NormalMapped;
+	wrengine::Entity spriteEntity = activeScene->createEntity("main");
+	auto& spriteRenderComponent = spriteEntity.addComponent<wrengine::SpriteRenderComponent>();
+	auto& spriteTransformComponent = spriteEntity.addComponent<wrengine::TransformComponent>();
+	spriteEntity.addComponent<wrengine::ScriptComponent>().bind<SpriteController>();
+	spriteRenderComponent.material.albedo = m_engine->getTextureByName("albedo");
+	spriteRenderComponent.material.normalMap = m_engine->getTextureByName("normal");
+	spriteRenderComponent.material.shaderConfig = wrengine::ShaderConfig::NormalMapped;
+	spriteTransformComponent.scale = glm::vec3(m_spriteWidth, m_spriteHeight, 1.0f);
 
 	// point light
 	wrengine::Entity lightEntity = activeScene->createEntity("light");
@@ -86,7 +87,7 @@ void AsepriteRenderHook::initEngine()
 	cameraEntity.getComponent<wrengine::TransformComponent>().rotation = glm::vec3(0.0f, 0.0f, 1.0f);
 
 	std::shared_ptr<MainWindow> mainWindow = std::make_shared<MainWindow>(m_engine);
-	mainWindow->setSprite(gemEntity);
+	mainWindow->setSprite(spriteEntity);
 	mainWindow->setLight(lightEntity);
 	m_engine->getUIManager()->pushElement(mainWindow);
 }
@@ -123,6 +124,8 @@ void AsepriteRenderHook::messageHandler(WebsocketServer::MessageType message)
 	else if (hdr[0] == 'I')
 	{
 		std::cout << "recieved init msg" << std::endl;
+		m_spriteWidth = width;
+		m_spriteHeight = height;
 		m_engine->loadTexture("albedo", payloadAlbd.data(), width, height, { .filterType = WR_FILTER_NEAREST });
 		m_engine->loadTexture("normal", payloadNorm.data(), width, height, { .filterType = WR_FILTER_NEAREST });
 		m_initCondition.notify_one();
