@@ -8,6 +8,9 @@ void MainWindow::onAttach()
 {
 	m_spriteTransform = &m_mainSprite.getComponent<wrengine::TransformComponent>();
 	m_lightTransform = &m_light.getComponent<wrengine::TransformComponent>();
+
+	m_spriteUnitX = m_spriteTransform->scale.x;
+	m_spriteUnitY = m_spriteTransform->scale.y;
 }
 
 void MainWindow::onDetatch()
@@ -96,13 +99,13 @@ void MainWindow::onUIRender()
 		}
 	}
 
-	//ImGui::Separator();
-	//const char* items[] = { "A", "B", "C" };
-	//static int currentItem = 0;
-	//if (ImGui::Combo("Sprite Scales", &currentItem, items, IM_ARRAYSIZE(items)))
-	//{
-	//	std::cout << "item: " << currentItem << "\n";
-	//}
+	ImGui::Separator();
+	static int scaleIndex = 0;
+	if (ImGui::Combo("Sprite Scales", &scaleIndex, m_scaleStrings, IM_ARRAYSIZE(m_scaleStrings)))
+	{
+		m_spriteTransform->scale.x = m_spriteUnitX * m_scaleValues[scaleIndex];
+		m_spriteTransform->scale.y = m_spriteUnitY * m_scaleValues[scaleIndex];
+	}
 
 	ImGui::End();
 }

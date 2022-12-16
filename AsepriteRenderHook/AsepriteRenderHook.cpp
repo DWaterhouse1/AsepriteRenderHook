@@ -117,6 +117,8 @@ void AsepriteRenderHook::messageHandler(WebsocketServer::MessageType message)
 	
 	if (hdr[0] == 'R')
 	{
+		m_spriteWidth = width;
+		m_spriteHeight = height;
 		std::cout << "recieved sprite update msg" << std::endl;
 		m_engine->updateTextureData("albedo", std::move(payloadAlbd));
 		m_engine->updateTextureData("normal", std::move(payloadNorm));

@@ -46,4 +46,10 @@ private:
 	wrengine::Entity m_light;
 	wrengine::TransformComponent* m_spriteTransform = nullptr;
 	wrengine::TransformComponent* m_lightTransform = nullptr;
+
+	// scaling
+	const char* m_scaleStrings[5] = { "0.25", "0.5", "1", "2", "3" };
+	const float m_scaleValues[5] = { 0.25, 0.5, 1.0, 2.0, 3.0 };
+	float m_spriteUnitX = 1.0f;
+	float m_spriteUnitY = 1.0f;
 };
