@@ -100,7 +100,7 @@ void MainWindow::onUIRender()
 	}
 
 	ImGui::Separator();
-	static int scaleIndex = 0;
+	static int scaleIndex = 2;
 	if (ImGui::Combo("Sprite Scales", &scaleIndex, m_scaleStrings, IM_ARRAYSIZE(m_scaleStrings)))
 	{
 		m_spriteTransform->scale.x = m_spriteUnitX * m_scaleValues[scaleIndex];
